@@ -1,6 +1,8 @@
 rootProject.name = 'micro-services'
 
+include 'store-api'
 include 'store-service'
+
 include 'payment-api'
 include 'payment-service'
 

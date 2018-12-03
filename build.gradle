@@ -42,6 +42,7 @@ configure(subprojects) { project ->
     }
 
     dependencies {
+        compile "javax.validation:validation-api:${validationApiVersion}"
         compile "org.apache.commons:commons-lang3:${commonsLangVersion}"
         compile "com.google.code.gson:gson:${gsonVersion}"
         compile "com.google.guava:guava:${guavaVersion}"
