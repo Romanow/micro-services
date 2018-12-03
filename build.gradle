@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "com.github.ksoichiro:gradle-build-info-plugin:${gitPluginVersion}"
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "5.0"
+}
+
+configure(subprojects) { project ->
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'io.spring.dependency-management'
+    apply from: '../libraries.gradle'
+
+    group 'ru.romanow.services'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        compile "com.google.code.gson:gson:${gsonVersion}"
+        compile "org.apache.commons:commons-lang3:${commonsLangVersion}"
+        compile "com.google.guava:guava:${guavaVersion}"
+        compile "com.google.code.findbugs:jsr305:${findBugsVersion}"
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    }
+}

@@ -1,0 +1,14 @@
+rootProject.name = 'micro-services'
+
+include 'store-service'
+include 'payment-api'
+include 'payment-service'
+
+include 'warehouse-api'
+include 'warehouse-service'
+
+include 'warranty-api'
+include 'warranty-service'
+
+include 'zipkin-service'
+include 'eureka-service'
