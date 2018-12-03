@@ -1,0 +1,13 @@
+apply plugin: 'org.springframework.boot'
+
+group "ru.romanow.services.store-service"
+
+dependencies {
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "org.springframework.boot:spring-boot-starter-data"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-starter-logging"
+    
+    compile "org.springframework.cloud:spring-cloud-netflix-eureka-client"
+    compile "org.springframework.cloud:spring-cloud-starter-netflix-hystrix"
+}

@@ -8,10 +8,6 @@ buildscript {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = "5.0"
-}
-
 configure(subprojects) { project ->
     apply plugin: 'java'
     apply plugin: 'idea'
@@ -30,6 +26,10 @@ configure(subprojects) { project ->
         }
     }
 
+    jar {
+        archiveName =  "${project.name}.jar"
+    }
+
     dependencyManagement {
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
@@ -42,8 +42,8 @@ configure(subprojects) { project ->
     }
 
     dependencies {
-        compile "com.google.code.gson:gson:${gsonVersion}"
         compile "org.apache.commons:commons-lang3:${commonsLangVersion}"
+        compile "com.google.code.gson:gson:${gsonVersion}"
         compile "com.google.guava:guava:${guavaVersion}"
         compile "com.google.code.findbugs:jsr305:${findBugsVersion}"
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
