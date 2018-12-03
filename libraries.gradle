@@ -3,6 +3,8 @@ ext {
     guavaVersion = "20.0"
     validationApiVersion = "2.0.1.Final"
     commonsLangVersion = "3.4"
+    swaggerSpringVersion = "2.9.2"
+    swaggerVersion = "1.5.21"
     lombokVersion = "1.18.4"
     findBugsVersion = "3.0.2"
 }

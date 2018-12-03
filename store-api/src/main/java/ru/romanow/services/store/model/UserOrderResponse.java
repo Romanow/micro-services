@@ -12,5 +12,6 @@ public class UserOrderResponse {
     private UUID orderId;
     private String date;
     private String price;
+    private String model;
     private WarrantyStatus status;
 }
