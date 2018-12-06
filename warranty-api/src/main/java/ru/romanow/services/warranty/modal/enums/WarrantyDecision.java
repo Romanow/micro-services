@@ -1,4 +1,4 @@
-package ru.romanow.services.store.model.enums;
+package ru.romanow.services.warranty.modal.enums;
 
 public enum WarrantyDecision {
     RETURN, REFUSE

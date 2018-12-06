@@ -1,7 +1,5 @@
 apply plugin: 'org.springframework.boot'
 
-group "ru.romanow.services.store-service"
-
 dependencies {
     compile project(":store-api")
     compile project(":warehouse-api")

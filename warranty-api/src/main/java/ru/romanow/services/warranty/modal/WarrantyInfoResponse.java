@@ -1,10 +1,10 @@
-package ru.romanow.services.warehouse.model;
+package ru.romanow.services.warranty.modal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import ru.romanow.services.warehouse.model.enums.SizeChart;
+import ru.romanow.services.warranty.modal.enums.WarrantyStatus;
 
 import java.util.UUID;
 
@@ -12,8 +12,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderInfoResponse {
+public class WarrantyInfoResponse {
     private UUID itemId;
-    private String model;
-    private SizeChart size;
+    private WarrantyStatus status;
 }

@@ -1,0 +1,5 @@
+dependencies {
+    compile project(":store-api")
+    compile project(":warehouse-api")
+    compile project(":warranty-api")
+}

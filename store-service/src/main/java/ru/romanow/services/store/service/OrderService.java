@@ -11,7 +11,7 @@ public interface OrderService {
     UserOrdersResponse findUserOrders(@Nonnull UUID userId);
 
     @Nonnull
-    UserOrdersResponse findUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId);
+    UserOrderResponse findUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId);
 
     @Nonnull
     UUID makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request);
