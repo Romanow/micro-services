@@ -48,5 +48,22 @@ configure(subprojects) { project ->
         compile "com.google.guava:guava:${guavaVersion}"
         compile "com.google.code.findbugs:jsr305:${findBugsVersion}"
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        
+        if (project.name.endsWith('-service')) {
+            compile "org.springframework.boot:spring-boot-starter-web"
+            compile "org.springframework.boot:spring-boot-starter-data-jpa"
+            compile "org.springframework.boot:spring-boot-starter-actuator"
+            compile "org.springframework.boot:spring-boot-starter-logging"
+
+            compile "org.springframework.cloud:spring-cloud-netflix-eureka-client"
+            compile "org.springframework.cloud:spring-cloud-starter-netflix-hystrix"
+
+            compile "org.postgresql:postgresql"
+            compile "org.flywaydb:flyway-core"
+
+            compile "io.swagger:swagger-annotations:${swaggerVersion}"
+            compile "io.springfox:springfox-swagger2:${swaggerSpringVersion}"
+        }
     }
 }

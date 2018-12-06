@@ -12,5 +12,5 @@ include 'warehouse-service'
 include 'warranty-api'
 include 'warranty-service'
 
-include 'zipkin-service'
-include 'eureka-service'
+include 'zipkin'
+include 'eureka'
