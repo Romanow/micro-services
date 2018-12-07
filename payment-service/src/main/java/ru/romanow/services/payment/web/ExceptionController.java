@@ -1,4 +1,4 @@
-package ru.romanow.services.store.web;
+package ru.romanow.services.payment.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,8 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import ru.romanow.services.store.model.ErrorResponse;
-import ru.romanow.services.store.service.UserNotFoundException;
+import ru.romanow.services.payment.model.ErrorResponse;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -26,7 +25,7 @@ public class ExceptionController {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({UserNotFoundException.class, EntityNotFoundException.class})
+    @ExceptionHandler(EntityNotFoundException.class)
     public @ResponseBody ErrorResponse handleNotFound(RuntimeException exception) {
         return new ErrorResponse(exception.getMessage());
     }

@@ -47,7 +47,7 @@ configure(subprojects) { project ->
         compile "com.google.code.gson:gson:${gsonVersion}"
         compile "com.google.guava:guava:${guavaVersion}"
         compile "com.google.code.findbugs:jsr305:${findBugsVersion}"
-        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        compile "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         
         if (project.name.endsWith('-service')) {

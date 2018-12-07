@@ -9,4 +9,6 @@ public interface UserService {
 
     @Nonnull
     User getUserById(@Nonnull UUID userId);
+
+    boolean checkUserExists(@Nonnull UUID userId);
 }

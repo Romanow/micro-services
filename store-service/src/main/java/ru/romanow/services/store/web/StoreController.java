@@ -15,6 +15,7 @@ import java.util.UUID;
 import static java.lang.String.format;
 
 @RestController
+@RequestMapping("/api")
 @AllArgsConstructor
 public class StoreController {
     private OrderService orderService;
@@ -25,7 +26,7 @@ public class StoreController {
     }
 
     @GetMapping("/{userId}/{orderId}")
-    private UserOrdersResponse orders(@RequestParam UUID userId, @RequestParam UUID orderId) {
+    private UserOrderResponse orders(@RequestParam UUID userId, @RequestParam UUID orderId) {
         return orderService.findUserOrder(userId, orderId);
     }
 

@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.romanow.services.warranty.modal.WarrantyInfoResponse;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,12 +24,12 @@ public class WarrantyServiceImpl
     @Nonnull
     @Override
     @HystrixCommand(fallbackMethod = "getItemWarrantyInfoFallback")
-    public WarrantyInfoResponse getItemWarrantyInfo(@Nonnull UUID itemId) {
-        return restTemplate.getForObject(WARRANTY_SERVICE + "/api/" + itemId, WarrantyInfoResponse.class);
+    public Optional<WarrantyInfoResponse> getItemWarrantyInfo(@Nonnull UUID itemId) {
+        return Optional.ofNullable(restTemplate.getForObject(WARRANTY_SERVICE + "/api/" + itemId, WarrantyInfoResponse.class));
     }
 
-    public WarrantyInfoResponse getItemWarrantyInfoFallback(@Nonnull UUID itemId) {
+    public Optional<WarrantyInfoResponse> getItemWarrantyInfoFallback(@Nonnull UUID itemId) {
         logger.warn("Request to '%s/api/%s/%s failed. Use fallback", WARRANTY_SERVICE, itemId);
-        return new WarrantyInfoResponse().setItemId(itemId);
+        return Optional.of(new WarrantyInfoResponse().setItemId(itemId));
     }
 }

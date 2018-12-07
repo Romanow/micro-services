@@ -10,6 +10,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 public class PaymentInfoResponse {
     private UUID orderId;
+    private String orderDate;
     private UUID itemId;
     private PaymentStatus status;
 }

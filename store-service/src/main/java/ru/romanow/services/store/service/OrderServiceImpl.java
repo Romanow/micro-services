@@ -4,15 +4,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.romanow.services.payment.model.PaymentInfoResponse;
 import ru.romanow.services.store.model.*;
-import ru.romanow.services.warehouse.model.OrderInfoResponse;
-import ru.romanow.services.warranty.modal.WarrantyInfoResponse;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
-import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.lang.String.format;
 import static ru.romanow.services.store.service.DateTimeHelper.now;
 
 @Service
@@ -27,27 +26,55 @@ public class OrderServiceImpl
     @Nonnull
     @Override
     public UserOrdersResponse findUserOrders(@Nonnull UUID userId) {
-        return null;
+        if (!userService.checkUserExists(userId)) {
+            throw new UserNotFoundException(format("User '%s' not found", userId));
+        }
+        final List<UserOrderResponse> orders = new ArrayList<>();
+        final Optional<List<PaymentInfoResponse>> userOrders = paymentService.getPaymentInfoByUser(userId);
+        if (userOrders.isPresent()) {
+            for (PaymentInfoResponse paymentInfo: userOrders.get()) {
+                final UserOrderResponse order =
+                        new UserOrderResponse()
+                                .setOrderId(paymentInfo.getOrderId())
+                                .setDate(paymentInfo.getOrderDate());
+
+                final UUID itemId = paymentInfo.getItemId();
+                warehouseService.getOrderInfo(itemId)
+                        .map(orderInfo -> order
+                                .setModel(orderInfo.getModel())
+                                .setSize(orderInfo.getSize()));
+
+                warrantyService.getItemWarrantyInfo(itemId)
+                        .map(warrantyInfo -> order.setStatus(warrantyInfo.getStatus()));
+
+                orders.add(order);
+            }
+        }
+
+        return new UserOrdersResponse(orders);
     }
 
     @Nonnull
     @Override
     public UserOrderResponse findUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId) {
-        final PaymentInfoResponse paymentInfo = paymentService.getPaymentInfoByOrder(userId, orderId);
+        if (!userService.checkUserExists(userId)) {
+            throw new UserNotFoundException(format("User '%s' not found", userId));
+        }
+
+        final Optional<PaymentInfoResponse> paymentInfo = paymentService.getPaymentInfoByOrder(userId, orderId);
 
         final UserOrderResponse orderResponse =
-                new UserOrderResponse()
-                        .setOrderId(orderId)
-                        .setDate(now());
-        if (paymentInfo != null) {
-            final UUID itemId = paymentInfo.getItemId();
-            CompletableFuture<OrderInfoResponse> paymentInfoFuture =
-                    supplyAsync(() -> warehouseService.getOrderInfo(itemId));
-            CompletableFuture<WarrantyInfoResponse> warrantyInfoFuture =
-                    supplyAsync(() -> warrantyService.getItemWarrantyInfo(itemId));
+                new UserOrderResponse().setOrderId(orderId);
+        if (paymentInfo.isPresent()) {
+            final UUID itemId = paymentInfo.get().getItemId();
+            orderResponse.setDate(paymentInfo.get().getOrderDate());
+            warehouseService.getOrderInfo(itemId)
+                    .map(orderInfo -> orderResponse
+                            .setModel(orderInfo.getModel())
+                            .setSize(orderInfo.getSize()));
 
-            CompletableFuture.allOf(paymentInfoFuture, warrantyInfoFuture).join();
-
+            warrantyService.getItemWarrantyInfo(itemId)
+                    .map(warrantyInfo -> orderResponse.setStatus(warrantyInfo.getStatus()));
         }
 
         return orderResponse;

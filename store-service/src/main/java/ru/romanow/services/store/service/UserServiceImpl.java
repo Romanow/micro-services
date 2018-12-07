@@ -25,4 +25,10 @@ public class UserServiceImpl
         return userRepository.findByUid(userId)
                 .orElseThrow(() -> new EntityNotFoundException(format("User with id '%s' not found", userId)));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkUserExists(@Nonnull UUID userId) {
+        return userRepository.findByUid(userId).isPresent();
+    }
 }

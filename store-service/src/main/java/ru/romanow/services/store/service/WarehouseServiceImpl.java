@@ -10,6 +10,7 @@ import ru.romanow.services.warehouse.model.OrderInfoResponse;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -21,15 +22,15 @@ public class WarehouseServiceImpl
     private static final String WAREHOUSE_SERVICE = "warehouse-service";
     private final RestTemplate restTemplate;
 
-    @Nullable
+    @Nonnull
     @Override
     @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
-    public OrderInfoResponse getOrderInfo(@Nonnull UUID itemId) {
-        return restTemplate.getForObject(WAREHOUSE_SERVICE + "/api/" + itemId, OrderInfoResponse.class);
+    public Optional<OrderInfoResponse> getOrderInfo(@Nonnull UUID itemId) {
+        return Optional.ofNullable(restTemplate.getForObject(WAREHOUSE_SERVICE + "/api/" + itemId, OrderInfoResponse.class));
     }
 
-    private OrderInfoResponse getOrderInfoFallback(@Nonnull UUID itemId) {
+    private Optional<OrderInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId) {
         logger.warn("Request to '%s/api/%s/%s failed. Use fallback", WAREHOUSE_SERVICE, itemId);
-        return new OrderInfoResponse().setItemId(itemId);
+        return Optional.of(new OrderInfoResponse().setItemId(itemId));
     }
 }

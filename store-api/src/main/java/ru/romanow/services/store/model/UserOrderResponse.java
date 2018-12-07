@@ -2,6 +2,7 @@ package ru.romanow.services.store.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import ru.romanow.services.warehouse.model.enums.SizeChart;
 import ru.romanow.services.warranty.modal.enums.WarrantyStatus;
 
 import java.util.UUID;
@@ -13,5 +14,6 @@ public class UserOrderResponse {
     private String date;
     private String price;
     private String model;
+    private SizeChart size;
     private WarrantyStatus status;
 }
