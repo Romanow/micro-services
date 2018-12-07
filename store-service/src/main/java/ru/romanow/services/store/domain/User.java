@@ -13,8 +13,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "users",
         indexes = {
-                @Index(name = "idx_user_name", unique = true, columnList = "name"),
-                @Index(name = "idx_user_uid", unique = true, columnList = "uid"),
+                @Index(name = "idx_user_name", columnList = "name", unique = true),
+                @Index(name = "idx_user_uid", columnList = "uid", unique = true),
         })
 public class User {
 
@@ -25,7 +25,7 @@ public class User {
     @Column(unique = true)
     private String name;
 
-    @Column(unique = true)
+    @Column(length = 40, unique = true)
     private UUID uid;
 
     @Override

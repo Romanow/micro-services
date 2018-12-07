@@ -12,7 +12,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderInfoResponse {
+public class ItemInfoResponse {
     private UUID itemId;
     private String model;
     private SizeChart size;

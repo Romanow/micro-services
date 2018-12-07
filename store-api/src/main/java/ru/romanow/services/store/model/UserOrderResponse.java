@@ -15,5 +15,6 @@ public class UserOrderResponse {
     private String price;
     private String model;
     private SizeChart size;
-    private WarrantyStatus status;
+    private String warrantyDate;
+    private WarrantyStatus warrantyStatus;
 }

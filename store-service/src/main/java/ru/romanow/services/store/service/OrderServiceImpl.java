@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
-import static ru.romanow.services.store.service.DateTimeHelper.now;
 
 @Service
 @AllArgsConstructor
@@ -32,20 +31,22 @@ public class OrderServiceImpl
         final List<UserOrderResponse> orders = new ArrayList<>();
         final Optional<List<PaymentInfoResponse>> userOrders = paymentService.getPaymentInfoByUser(userId);
         if (userOrders.isPresent()) {
-            for (PaymentInfoResponse paymentInfo: userOrders.get()) {
+            for (PaymentInfoResponse paymentInfo : userOrders.get()) {
                 final UserOrderResponse order =
                         new UserOrderResponse()
                                 .setOrderId(paymentInfo.getOrderId())
                                 .setDate(paymentInfo.getOrderDate());
 
                 final UUID itemId = paymentInfo.getItemId();
-                warehouseService.getOrderInfo(itemId)
+                warehouseService.getItemInfo(itemId)
                         .map(orderInfo -> order
                                 .setModel(orderInfo.getModel())
                                 .setSize(orderInfo.getSize()));
 
                 warrantyService.getItemWarrantyInfo(itemId)
-                        .map(warrantyInfo -> order.setStatus(warrantyInfo.getStatus()));
+                        .map(warrantyInfo -> order
+                                .setWarrantyDate(warrantyInfo.getWarrantyDate())
+                                .setWarrantyStatus(warrantyInfo.getStatus()));
 
                 orders.add(order);
             }
@@ -68,13 +69,15 @@ public class OrderServiceImpl
         if (paymentInfo.isPresent()) {
             final UUID itemId = paymentInfo.get().getItemId();
             orderResponse.setDate(paymentInfo.get().getOrderDate());
-            warehouseService.getOrderInfo(itemId)
+            warehouseService.getItemInfo(itemId)
                     .map(orderInfo -> orderResponse
                             .setModel(orderInfo.getModel())
                             .setSize(orderInfo.getSize()));
 
             warrantyService.getItemWarrantyInfo(itemId)
-                    .map(warrantyInfo -> orderResponse.setStatus(warrantyInfo.getStatus()));
+                    .map(warrantyInfo -> orderResponse
+                            .setWarrantyDate(warrantyInfo.getWarrantyDate())
+                            .setWarrantyStatus(warrantyInfo.getStatus()));
         }
 
         return orderResponse;

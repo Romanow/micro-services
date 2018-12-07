@@ -14,5 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class WarrantyInfoResponse {
     private UUID itemId;
+    private String warrantyDate;
     private WarrantyStatus status;
 }

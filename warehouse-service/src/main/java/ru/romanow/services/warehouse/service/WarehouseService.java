@@ -1,13 +1,13 @@
-package ru.romanow.services.store.service;
+package ru.romanow.services.warehouse.service;
 
 import ru.romanow.services.warehouse.model.ItemInfoResponse;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public interface WarehouseService {
 
-    @Nonnull
-    Optional<ItemInfoResponse> getItemInfo(@Nonnull UUID itemId);
+    @Nullable
+    ItemInfoResponse getItemInfo(@Nonnull UUID itemId);
 }

@@ -10,5 +10,6 @@ import java.util.UUID;
 @Accessors(chain = true)
 public class WarrantyResponse {
     private UUID orderId;
+    private String warrantyDate;
     private WarrantyDecision decision;
 }
