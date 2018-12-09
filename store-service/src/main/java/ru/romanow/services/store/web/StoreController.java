@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.romanow.services.store.model.*;
-import ru.romanow.services.store.service.OrderService;
+import ru.romanow.services.store.service.StoreService;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -18,16 +18,16 @@ import static java.lang.String.format;
 @RequestMapping("/api")
 @AllArgsConstructor
 public class StoreController {
-    private OrderService orderService;
+    private StoreService storeService;
 
     @GetMapping(value = "/{userId}/orders", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     private UserOrdersResponse orders(@RequestParam UUID userId) {
-        return orderService.findUserOrders(userId);
+        return storeService.findUserOrders(userId);
     }
 
     @GetMapping("/{userId}/{orderId}")
     private UserOrderResponse orders(@RequestParam UUID userId, @RequestParam UUID orderId) {
-        return orderService.findUserOrder(userId, orderId);
+        return storeService.findUserOrder(userId, orderId);
     }
 
     @PostMapping(value = "/{userId}/purchase",
@@ -36,7 +36,7 @@ public class StoreController {
     private void purchase(@RequestParam UUID userId,
                                       @RequestBody @Valid PurchaseRequest request,
                                       HttpServletResponse servletResponse) {
-        final UUID orderId = orderService.makePurchase(userId, request);
+        final UUID orderId = storeService.makePurchase(userId, request);
         servletResponse.setHeader(HttpHeaders.LOCATION, format("/%s/%s/", userId, orderId));
     }
 
@@ -46,7 +46,7 @@ public class StoreController {
                    produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     private void purchase(@RequestParam UUID userId,
                           @RequestParam UUID orderId) {
-        orderService.refundPurchase(userId, orderId);
+        storeService.refundPurchase(userId, orderId);
     }
 
     @PostMapping(value = "/{userId}/{orderId}/warranty",
@@ -55,6 +55,6 @@ public class StoreController {
     private WarrantyResponse purchase(@RequestParam UUID userId,
                                       @RequestParam UUID orderId,
                                       @RequestBody @Valid WarrantyRequest request) {
-        return orderService.warrantyRequest(userId, orderId, request);
+        return storeService.warrantyRequest(userId, orderId, request);
     }
 }

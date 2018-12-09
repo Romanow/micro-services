@@ -9,5 +9,5 @@ import java.util.UUID;
 public interface WarrantyService {
 
     @Nonnull
-    OrderWarrantyResponse warrantyRequest(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request)
+    OrderWarrantyResponse warrantyRequest(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request);
 }

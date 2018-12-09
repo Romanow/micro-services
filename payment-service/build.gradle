@@ -1,7 +1,0 @@
-apply plugin: 'org.springframework.boot'
-
-dependencies {
-    compile project(":payment-api")
-    compile project(":warranty-api")
-    compile project(":warehouse-api")
-}

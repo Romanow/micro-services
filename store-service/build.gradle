@@ -2,7 +2,7 @@ apply plugin: 'org.springframework.boot'
 
 dependencies {
     compile project(":store-api")
+    compile project(":order-api")
     compile project(":warehouse-api")
-    compile project(":payment-api")
     compile project(":warranty-api")
 }

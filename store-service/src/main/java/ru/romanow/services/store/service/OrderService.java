@@ -1,24 +1,28 @@
 package ru.romanow.services.store.service;
 
-import ru.romanow.services.store.model.*;
+import ru.romanow.services.order.model.OrderInfoResponse;
+import ru.romanow.services.store.model.PurchaseRequest;
+import ru.romanow.services.store.model.WarrantyRequest;
+import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface OrderService {
 
     @Nonnull
-    UserOrdersResponse findUserOrders(@Nonnull UUID userId);
+    Optional<OrderInfoResponse> getOrderInfo(@Nonnull UUID userId, @Nonnull UUID orderId);
 
     @Nonnull
-    UserOrderResponse findUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId);
-
-    @Nullable
-    UUID makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request);
-
-    void refundPurchase(@Nonnull UUID userId, @Nonnull UUID orderId);
+    Optional<List<OrderInfoResponse>> getOrderInfoByUser(@Nonnull UUID userId);
 
     @Nonnull
-    WarrantyResponse warrantyRequest(@Nonnull UUID userId, @Nonnull UUID orderId, @Nonnull WarrantyRequest request);
+    Optional<UUID> makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request);
+
+    void refundPurchase(@Nonnull UUID orderId);
+
+    @Nonnull
+    Optional<OrderWarrantyResponse> warrantyRequest(@Nonnull UUID orderId, @Nonnull WarrantyRequest request);
 }

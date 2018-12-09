@@ -3,4 +3,5 @@ apply plugin: 'org.springframework.boot'
 dependencies {
     compile project(":order-api")
     compile project(":warranty-api")
+    compile project(":warehouse-api")
 }

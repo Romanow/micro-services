@@ -1,149 +1,81 @@
 package ru.romanow.services.store.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import ru.romanow.services.payment.model.OrderInfoResponse;
-import ru.romanow.services.store.exceptions.OrderProcessException;
-import ru.romanow.services.store.exceptions.UserNotFoundException;
-import ru.romanow.services.store.model.*;
-import ru.romanow.services.store.model.enums.SizeChart;
-import ru.romanow.services.store.model.enums.WarrantyDecision;
-import ru.romanow.services.store.model.enums.WarrantyStatus;
+import org.springframework.web.client.RestTemplate;
+import ru.romanow.services.order.model.OrderInfoResponse;
+import ru.romanow.services.store.model.PurchaseRequest;
+import ru.romanow.services.store.model.WarrantyRequest;
+import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.lang.String.format;
+import static com.google.common.collect.Lists.newArrayList;
 
 @Service
 @AllArgsConstructor
 public class OrderServiceImpl
         implements OrderService {
-    private final UserService userService;
-    private final WarehouseService warehouseService;
-    private final PaymentService paymentService;
-    private final WarrantyService warrantyService;
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+
+    private static final String ORDER_SERVICE = "order-service";
+    private final RestTemplate restTemplate;
 
     @Nonnull
     @Override
-    public UserOrdersResponse findUserOrders(@Nonnull UUID userId) {
-        if (!userService.checkUserExists(userId)) {
-            throw new UserNotFoundException(format("User '%s' not found", userId));
-        }
-        final List<UserOrderResponse> orders = new ArrayList<>();
-        final Optional<List<OrderInfoResponse>> userOrders = paymentService.getOrderInfoByUser(userId);
-        if (userOrders.isPresent()) {
-            for (OrderInfoResponse paymentInfo : userOrders.get()) {
-                final UserOrderResponse order =
-                        new UserOrderResponse()
-                                .setOrderId(paymentInfo.getOrderId())
-                                .setDate(paymentInfo.getOrderDate());
-
-                final UUID itemId = paymentInfo.getItemId();
-                warehouseService.getItemInfo(itemId)
-                                .map(orderInfo -> order
-                                        .setModel(orderInfo.getModel())
-                                        .setSize(convertToStoreSize(orderInfo.getSize())));
-
-                warrantyService.getItemWarrantyInfo(itemId)
-                               .map(warrantyInfo -> order
-                                       .setWarrantyDate(warrantyInfo.getWarrantyDate())
-                                       .setWarrantyStatus(convertToStoreWarrantyStatus(warrantyInfo.getStatus())));
-
-                orders.add(order);
-            }
-        }
-
-        return new UserOrdersResponse(orders);
+    @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
+    public Optional<OrderInfoResponse> getOrderInfo(@Nonnull UUID userId, @Nonnull UUID orderId) {
+        return Optional.ofNullable(restTemplate.getForObject(ORDER_SERVICE + "/api/" + userId + "/" + orderId, OrderInfoResponse.class));
     }
 
     @Nonnull
     @Override
-    public UserOrderResponse findUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId) {
-        if (!userService.checkUserExists(userId)) {
-            throw new UserNotFoundException(format("User '%s' not found", userId));
-        }
-
-        final Optional<OrderInfoResponse> orderInfo = paymentService.getOrderInfo(userId, orderId);
-
-        final UserOrderResponse orderResponse =
-                new UserOrderResponse().setOrderId(orderId);
-        if (orderInfo.isPresent()) {
-            final UUID itemId = orderInfo.get().getItemId();
-            orderResponse.setDate(orderInfo.get().getOrderDate());
-            warehouseService.getItemInfo(itemId)
-                            .map(info -> orderResponse
-                                    .setModel(info.getModel())
-                                    .setSize(convertToStoreSize(info.getSize())));
-
-            warrantyService.getItemWarrantyInfo(itemId)
-                           .map(warrantyInfo -> orderResponse
-                                   .setWarrantyDate(warrantyInfo.getWarrantyDate())
-                                   .setWarrantyStatus(convertToStoreWarrantyStatus(warrantyInfo.getStatus())));
-        }
-
-        return orderResponse;
-    }
-
-    @Nullable
-    @Override
-    public UUID makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request) {
-        if (!userService.checkUserExists(userId)) {
-            throw new UserNotFoundException(format("User '%s' not found", userId));
-        }
-
-        return paymentService
-                .makePurchase(userId, request)
-                .orElseThrow(() -> new OrderProcessException("Order not created"));
-    }
-
-    @Override
-    public void refundPurchase(@Nonnull UUID userId, @Nonnull UUID orderId) {
-        if (!userService.checkUserExists(userId)) {
-            throw new UserNotFoundException(format("User '%s' not found", userId));
-        }
-
-        paymentService.refundPurchase(orderId);
+    @HystrixCommand(fallbackMethod = "getOrderInfoByUserFallback")
+    public Optional<List<OrderInfoResponse>> getOrderInfoByUser(@Nonnull UUID userId) {
+        final ParameterizedTypeReference<List<OrderInfoResponse>> type =
+                new ParameterizedTypeReference<List<OrderInfoResponse>>() {};
+        return Optional.ofNullable(restTemplate.exchange(ORDER_SERVICE + "/api/" + userId, HttpMethod.GET, null, type).getBody());
     }
 
     @Nonnull
     @Override
-    public WarrantyResponse warrantyRequest(@Nonnull UUID userId, @Nonnull UUID orderId, @Nonnull WarrantyRequest request) {
-        if (!userService.checkUserExists(userId)) {
-            throw new UserNotFoundException(format("User '%s' not found", userId));
-        }
+    @HystrixCommand
+    public Optional<UUID> makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request) {
+        return Optional.ofNullable(restTemplate.postForObject(ORDER_SERVICE + "/api/" + userId, request, UUID.class));
+    }
 
-        return paymentService
-                .warrantyRequest(orderId, request)
-                .map(resp -> buildWarrantyResponse(orderId, resp))
-                .orElseThrow(() -> new WarrantyProcessException("Warranty processed with exception"));
+    @Override
+    @HystrixCommand
+    public void refundPurchase(@Nonnull UUID orderId) {
+        restTemplate.delete(ORDER_SERVICE + "/api/" + orderId);
     }
 
     @Nonnull
-    private WarrantyResponse buildWarrantyResponse(@Nonnull UUID orderId, @Nonnull OrderWarrantyResponse response) {
-        return new WarrantyResponse()
-                .setOrderId(orderId)
-                .setDecision(convertToStoreWarrantyDecision(response.getDecision()))
-                .setWarrantyDate(response.getWarrantyDate());
+    @Override
+    @HystrixCommand
+    public Optional<OrderWarrantyResponse> warrantyRequest(@Nonnull UUID orderId, @Nonnull WarrantyRequest request) {
+        final OrderWarrantyRequest warrantyRequest = new OrderWarrantyRequest().setReason(request.getReason());
+        return Optional.ofNullable(restTemplate.postForObject(ORDER_SERVICE + "/api/" + orderId + "/warranty", warrantyRequest, OrderWarrantyResponse.class));
     }
 
     @Nonnull
-    private WarrantyDecision convertToStoreWarrantyDecision(@Nonnull ru.romanow.services.warranty.modal.enums.WarrantyDecision decision) {
-        return WarrantyDecision.valueOf(decision.name());
+    private Optional<OrderInfoResponse> getOrderInfoFallback(@Nonnull UUID userId, @Nonnull UUID orderId) {
+        logger.warn("Request to GET '%s/api/%s/%s failed. Use fallback", ORDER_SERVICE, userId, orderId);
+        return Optional.of(new OrderInfoResponse().setOrderId(orderId));
     }
 
     @Nonnull
-    private WarrantyStatus convertToStoreWarrantyStatus(@Nonnull ru.romanow.services.warranty.modal.enums.WarrantyStatus status) {
-        return WarrantyStatus.valueOf(status.name());
-    }
-
-    @Nonnull
-    private SizeChart convertToStoreSize(@Nonnull ru.romanow.services.warehouse.model.enums.SizeChart size) {
-        return SizeChart.valueOf(size.name());
+    private Optional<List<OrderInfoResponse>> getOrderInfoByUserFallback(@Nonnull UUID userId) {
+        logger.warn("Request to GET '%s/api/%s failed. Use fallback", ORDER_SERVICE, userId);
+        return Optional.of(newArrayList());
     }
 }
