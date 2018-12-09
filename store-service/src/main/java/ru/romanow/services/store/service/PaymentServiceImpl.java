@@ -8,10 +8,13 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ru.romanow.services.payment.model.PaymentInfoResponse;
+import ru.romanow.services.payment.model.OrderInfoResponse;
+import ru.romanow.services.store.model.PurchaseRequest;
+import ru.romanow.services.store.model.WarrantyRequest;
+import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
+import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,29 +32,50 @@ public class PaymentServiceImpl
 
     @Nonnull
     @Override
-    @HystrixCommand(fallbackMethod = "getPaymentInfoByOrderFallback")
-    public Optional<PaymentInfoResponse> getPaymentInfoByOrder(@Nonnull UUID userId, @Nonnull UUID orderId) {
-        return Optional.ofNullable(restTemplate.getForObject(PAYMENT_SERVICE + "/api/" + userId + "/" + orderId, PaymentInfoResponse.class));
+    @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
+    public Optional<OrderInfoResponse> getOrderInfo(@Nonnull UUID userId, @Nonnull UUID orderId) {
+        return Optional.ofNullable(restTemplate.getForObject(PAYMENT_SERVICE + "/api/" + userId + "/" + orderId, OrderInfoResponse.class));
     }
 
     @Nonnull
     @Override
-    @HystrixCommand(fallbackMethod = "getPaymentInfoByUserFallback")
-    public Optional<List<PaymentInfoResponse>> getPaymentInfoByUser(@Nonnull UUID userId) {
-        final ParameterizedTypeReference<List<PaymentInfoResponse>> type =
-                new ParameterizedTypeReference<List<PaymentInfoResponse>>() {};
+    @HystrixCommand(fallbackMethod = "getOrderInfoByUserFallback")
+    public Optional<List<OrderInfoResponse>> getOrderInfoByUser(@Nonnull UUID userId) {
+        final ParameterizedTypeReference<List<OrderInfoResponse>> type =
+                new ParameterizedTypeReference<List<OrderInfoResponse>>() {};
         return Optional.ofNullable(restTemplate.exchange(PAYMENT_SERVICE + "/api/" + userId, HttpMethod.GET, null, type).getBody());
     }
 
     @Nonnull
-    private Optional<PaymentInfoResponse> getPaymentInfoByOrderFallback(@Nonnull UUID userId, @Nonnull UUID orderId) {
-        logger.warn("Request to '%s/api/%s/%s failed. Use fallback", PAYMENT_SERVICE, userId, orderId);
-        return Optional.of(new PaymentInfoResponse().setOrderId(orderId));
+    @Override
+    @HystrixCommand
+    public Optional<UUID> makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request) {
+        return Optional.ofNullable(restTemplate.postForObject(PAYMENT_SERVICE + "/api/" + userId, request, UUID.class));
+    }
+
+    @Override
+    @HystrixCommand
+    public void refundPurchase(@Nonnull UUID orderId) {
+        restTemplate.delete(PAYMENT_SERVICE + "/api/" + orderId);
     }
 
     @Nonnull
-    public Optional<List<PaymentInfoResponse>> getPaymentInfoByUserFallback(@Nonnull UUID userId) {
-        logger.warn("Request to '%s/api/%s failed. Use fallback", PAYMENT_SERVICE, userId);
+    @Override
+    @HystrixCommand
+    public Optional<OrderWarrantyResponse> warrantyRequest(@Nonnull UUID orderId, @Nonnull WarrantyRequest request) {
+        final OrderWarrantyRequest warrantyRequest = new OrderWarrantyRequest().setReason(request.getReason());
+        return Optional.ofNullable(restTemplate.postForObject(PAYMENT_SERVICE + "/api/" + orderId + "/warranty", warrantyRequest, OrderWarrantyResponse.class));
+    }
+
+    @Nonnull
+    private Optional<OrderInfoResponse> getOrderInfoFallback(@Nonnull UUID userId, @Nonnull UUID orderId) {
+        logger.warn("Request to GET '%s/api/%s/%s failed. Use fallback", PAYMENT_SERVICE, userId, orderId);
+        return Optional.of(new OrderInfoResponse().setOrderId(orderId));
+    }
+
+    @Nonnull
+    private Optional<List<OrderInfoResponse>> getOrderInfoByUserFallback(@Nonnull UUID userId) {
+        logger.warn("Request to GET '%s/api/%s failed. Use fallback", PAYMENT_SERVICE, userId);
         return Optional.of(newArrayList());
     }
 }

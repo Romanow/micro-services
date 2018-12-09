@@ -2,7 +2,7 @@ package ru.romanow.services.store.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.romanow.services.warranty.modal.enums.WarrantyDecision;
+import ru.romanow.services.store.model.enums.WarrantyDecision;
 
 import java.util.UUID;
 

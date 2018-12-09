@@ -3,6 +3,7 @@ package ru.romanow.services.store.service;
 import ru.romanow.services.store.model.*;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public interface OrderService {
@@ -13,11 +14,10 @@ public interface OrderService {
     @Nonnull
     UserOrderResponse findUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId);
 
-    @Nonnull
+    @Nullable
     UUID makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request);
 
-    @Nonnull
-    RefundResponse refundPurchase(@Nonnull UUID userId, @Nonnull UUID orderId);
+    void refundPurchase(@Nonnull UUID userId, @Nonnull UUID orderId);
 
     @Nonnull
     WarrantyResponse warrantyRequest(@Nonnull UUID userId, @Nonnull UUID orderId, @Nonnull WarrantyRequest request);

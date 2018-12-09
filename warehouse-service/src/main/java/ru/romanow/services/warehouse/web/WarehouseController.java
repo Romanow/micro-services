@@ -1,14 +1,18 @@
 package ru.romanow.services.warehouse.web;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.romanow.services.warehouse.model.ItemInfoResponse;
+import ru.romanow.services.warehouse.model.OrderItemInfoResponse;
+import ru.romanow.services.warehouse.model.OrderItemRequest;
 import ru.romanow.services.warehouse.service.WarehouseService;
+import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
+import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
+import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -17,8 +21,30 @@ import java.util.UUID;
 public class WarehouseController {
     private final WarehouseService warehouseService;
 
+    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    private List<ItemInfoResponse> items() {
+        return warehouseService.getItemsInfo();
+    }
+
     @GetMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private ItemInfoResponse itemInfo(@RequestParam UUID itemId) {
+    private OrderItemInfoResponse item(@PathVariable UUID itemId) {
         return warehouseService.getItemInfo(itemId);
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public UUID takeItem(@Valid @RequestBody OrderItemRequest request) {
+        return warehouseService.takeItem(request);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{itemId}")
+    public void returnItem(@PathVariable UUID itemId) {
+        warehouseService.returnItem(itemId);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/{itemId}")
+    public OrderWarrantyResponse warranty(@PathVariable UUID itemId, @RequestBody @Valid OrderWarrantyRequest request) {
+        return warehouseService.warrantyRequest(itemId, request);
     }
 }

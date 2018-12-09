@@ -23,16 +23,19 @@ public class Warranty {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "item_id", unique = true, length = 40)
+    @Column(name = "item_id", nullable = false, unique = true, length = 40)
     private UUID itemId;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "warranty_date")
+    @Column(name = "warranty_date", nullable = false)
     private LocalDateTime warrantyDate;
 
-    @Column
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private WarrantyStatus status;
+
+    @Column(length = 1024)
+    private String comment;
 
     @Override
     public boolean equals(Object o) {

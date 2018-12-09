@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.romanow.services.store.exceptions.OrderProcessException;
+import ru.romanow.services.store.exceptions.UserNotFoundException;
 import ru.romanow.services.store.model.ErrorResponse;
-import ru.romanow.services.store.service.UserNotFoundException;
+import ru.romanow.services.store.service.WarrantyProcessException;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -28,6 +30,12 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({UserNotFoundException.class, EntityNotFoundException.class})
     public @ResponseBody ErrorResponse handleNotFound(RuntimeException exception) {
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler({WarrantyProcessException.class, OrderProcessException.class})
+    public @ResponseBody ErrorResponse conflict(RuntimeException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 

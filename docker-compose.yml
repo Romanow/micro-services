@@ -1,0 +1,19 @@
+version: '3'
+services:
+  eureka-1:
+    build: ./eureka
+    image: eureka:latest
+    container_name: eureka-1
+    ports:
+      - 8781:8781
+    environment:
+      - SPRING_PROFILES_ACTIVE=peer1
+
+  eureka-2:
+    build: ./eureka
+    image: eureka:latest
+    container_name: eureka-2
+    ports:
+    - 8782:8782
+    environment:
+    - SPRING_PROFILES_ACTIVE=peer2

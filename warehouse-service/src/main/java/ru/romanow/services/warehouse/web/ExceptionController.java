@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.romanow.services.warehouse.exceptions.ItemNotAvailableException;
 import ru.romanow.services.warehouse.model.ErrorResponse;
 
 import javax.persistence.EntityNotFoundException;
@@ -27,6 +28,12 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
     public @ResponseBody ErrorResponse handleNotFound(RuntimeException exception) {
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ItemNotAvailableException.class)
+    public @ResponseBody ErrorResponse conflict(ItemNotAvailableException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 

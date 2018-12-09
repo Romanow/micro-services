@@ -2,11 +2,10 @@ package ru.romanow.services.store.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import ru.romanow.services.store.model.enums.SizeChart;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.util.UUID;
 
 @Data
 @Accessors(chain = true)
@@ -16,5 +15,5 @@ public class PurchaseRequest {
     private String model;
 
     @NotNull(message = "{field.is.null")
-    private String size;
+    private SizeChart size;
 }

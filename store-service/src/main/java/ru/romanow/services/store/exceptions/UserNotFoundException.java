@@ -1,4 +1,4 @@
-package ru.romanow.services.store.service;
+package ru.romanow.services.store.exceptions;
 
 public class UserNotFoundException
         extends RuntimeException {

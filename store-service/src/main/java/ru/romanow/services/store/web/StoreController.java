@@ -1,8 +1,8 @@
 package ru.romanow.services.store.web;
 
 import com.google.common.net.HttpHeaders;
-import com.sun.deploy.security.WrapResource;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.romanow.services.store.model.*;
@@ -31,8 +31,8 @@ public class StoreController {
     }
 
     @PostMapping(value = "/{userId}/purchase",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+                 consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+                 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     private void purchase(@RequestParam UUID userId,
                                       @RequestBody @Valid PurchaseRequest request,
                                       HttpServletResponse servletResponse) {
@@ -40,17 +40,18 @@ public class StoreController {
         servletResponse.setHeader(HttpHeaders.LOCATION, format("/%s/%s/", userId, orderId));
     }
 
-    @PostMapping(value = "/{userId}/{orderId}/refund",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private RefundResponse purchase(@RequestParam UUID userId,
-                                    @RequestParam UUID orderId) {
-        return orderService.refundPurchase(userId, orderId);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping(value = "/{userId}/{orderId}/refund",
+                   consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+                   produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    private void purchase(@RequestParam UUID userId,
+                          @RequestParam UUID orderId) {
+        orderService.refundPurchase(userId, orderId);
     }
 
     @PostMapping(value = "/{userId}/{orderId}/warranty",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+                 consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+                 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     private WarrantyResponse purchase(@RequestParam UUID userId,
                                       @RequestParam UUID orderId,
                                       @RequestBody @Valid WarrantyRequest request) {

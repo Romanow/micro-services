@@ -22,10 +22,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(length = 40, unique = true)
+    @Column(nullable = false, length = 40, unique = true)
     private UUID uid;
 
     @Override

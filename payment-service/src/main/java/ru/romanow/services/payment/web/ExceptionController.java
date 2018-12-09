@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.romanow.services.payment.exceptions.CreateOrderException;
+import ru.romanow.services.payment.exceptions.WarrantyProcessingException;
 import ru.romanow.services.payment.model.ErrorResponse;
 
 import javax.persistence.EntityNotFoundException;
@@ -27,6 +29,12 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
     public @ResponseBody ErrorResponse handleNotFound(RuntimeException exception) {
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler({WarrantyProcessingException.class, CreateOrderException.class})
+    public @ResponseBody ErrorResponse conflict(RuntimeException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 

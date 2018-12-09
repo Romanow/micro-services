@@ -26,10 +26,6 @@ configure(subprojects) { project ->
         }
     }
 
-    jar {
-        archiveName =  "${project.name}.jar"
-    }
-
     dependencyManagement {
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"

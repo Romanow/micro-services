@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ru.romanow.services.warehouse.model.ItemInfoResponse;
+import ru.romanow.services.warehouse.model.OrderItemInfoResponse;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -17,19 +17,18 @@ import java.util.UUID;
 public class WarehouseServiceImpl
         implements WarehouseService {
     private static final Logger logger = LoggerFactory.getLogger(WarehouseService.class);
-
     private static final String WAREHOUSE_SERVICE = "warehouse-service";
     private final RestTemplate restTemplate;
 
     @Nonnull
     @Override
     @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
-    public Optional<ItemInfoResponse> getItemInfo(@Nonnull UUID itemId) {
-        return Optional.ofNullable(restTemplate.getForObject(WAREHOUSE_SERVICE + "/api/" + itemId, ItemInfoResponse.class));
+    public Optional<OrderItemInfoResponse> getItemInfo(@Nonnull UUID itemId) {
+        return Optional.ofNullable(restTemplate.getForObject(WAREHOUSE_SERVICE + "/api/" + itemId, OrderItemInfoResponse.class));
     }
 
-    private Optional<ItemInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId) {
+    private Optional<OrderItemInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId) {
         logger.warn("Request to '%s/api/%s/%s failed. Use fallback", WAREHOUSE_SERVICE, itemId);
-        return Optional.of(new ItemInfoResponse().setItemId(itemId));
+        return Optional.of(new OrderItemInfoResponse().setItemId(itemId));
     }
 }

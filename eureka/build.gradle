@@ -6,3 +6,11 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.cloud:spring-cloud-starter-netflix-eureka-server"
 }
+
+springBoot {
+    buildInfo()
+}
+
+bootJar {
+    archiveName = "eureka.jar"
+}

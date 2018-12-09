@@ -7,48 +7,45 @@ import lombok.experimental.Accessors;
 import ru.romanow.services.warehouse.model.enums.SizeChart;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Data
 @Accessors(chain = true)
 @Entity
-@Table(name = "items",
-       indexes = @Index(name = "idx_items_item_id", columnList = "item_id", unique = true)
-)
+@Table(name = "items")
 public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "item_id", unique = true, length = 40)
-    private UUID itemId;
-
-    @Column
+    @Column(nullable = false)
     private String model;
 
-    @Column
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private SizeChart size;
+
+    @Column(name = "available_count", nullable = false)
+    private int availableCount;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
-        return Objects.equal(itemId, item.itemId) &&
-                Objects.equal(model, item.model);
+        return Objects.equal(model, item.model) &&
+                size == item.size;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(itemId, model);
+        return Objects.hashCode(model, size);
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("itemId", itemId)
+        return MoreObjects
+                .toStringHelper(this)
                 .add("model", model)
                 .add("size", size)
                 .toString();

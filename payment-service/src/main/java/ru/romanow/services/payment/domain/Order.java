@@ -13,32 +13,32 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true)
 @Entity
-@Table(name = "payments",
+@Table(name = "orders",
        indexes = {
-        @Index(name = "idx_payments_user_id", columnList = "user_id"),
-        @Index(name = "idx_payments_order_id", columnList = "order_id", unique = true),
-        @Index(name = "idx_payments_user_id_and_order_id", columnList = "user_id, order_id"),
+               @Index(name = "idx_orders_user_id", columnList = "user_id"),
+               @Index(name = "idx_orders_order_id", columnList = "order_id", unique = true),
+               @Index(name = "idx_orders_user_id_and_order_id", columnList = "user_id, order_id"),
        })
-public class Payment {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_id", length = 40)
+    @Column(name = "user_id", nullable = false, length = 40)
     private UUID userId;
 
-    @Column(name = "order_id", unique = true, length = 40)
+    @Column(name = "order_id", nullable = false, unique = true, length = 40)
     private UUID orderId;
 
-    @Column(name = "item_id", length = 40)
+    @Column(name = "item_id", nullable = false, length = 40)
     private UUID itemId;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "order_date")
+    @Column(name = "order_date", nullable = false)
     private LocalDateTime orderDate;
 
-    @Column
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
@@ -46,10 +46,10 @@ public class Payment {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Payment payment = (Payment) o;
-        return Objects.equal(orderId, payment.orderId) &&
-                Objects.equal(itemId, payment.itemId) &&
-                status == payment.status;
+        Order order = (Order) o;
+        return Objects.equal(orderId, order.orderId) &&
+                Objects.equal(itemId, order.itemId) &&
+                status == order.status;
     }
 
     @Override
@@ -60,11 +60,11 @@ public class Payment {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("userId", userId)
-                .add("orderId", orderId)
-                .add("itemId", itemId)
-                .add("orderDate", orderDate)
-                .add("status", status)
-                .toString();
+                          .add("userId", userId)
+                          .add("orderId", orderId)
+                          .add("itemId", itemId)
+                          .add("orderDate", orderDate)
+                          .add("status", status)
+                          .toString();
     }
 }
