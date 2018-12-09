@@ -7,5 +7,5 @@ import java.util.UUID;
 public interface WarrantyService {
     void startWarranty(@Nonnull UUID itemId);
 
-    void cancelWarranty(@Nonnull UUID itemId);
+    void stopWarranty(@Nonnull UUID itemId);
 }

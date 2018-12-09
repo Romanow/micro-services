@@ -2,8 +2,6 @@ package ru.romanow.services.payment.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,7 +23,7 @@ public class WarrantyServiceImpl
 
     @Override
     @HystrixCommand
-    public void cancelWarranty(@Nonnull UUID itemId) {
+    public void stopWarranty(@Nonnull UUID itemId) {
         restTemplate.delete(WARRANTY_SERVICE + "/api/" + itemId);
     }
 }

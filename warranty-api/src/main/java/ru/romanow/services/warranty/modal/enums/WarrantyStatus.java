@@ -1,5 +1,5 @@
 package ru.romanow.services.warranty.modal.enums;
 
 public enum WarrantyStatus {
-    ON_WARRANTY, REMOVED_FROM_WARRANTY
+    ON_WARRANTY, USE_WARRANTY, REMOVED_FROM_WARRANTY
 }

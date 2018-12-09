@@ -11,8 +11,6 @@ import ru.romanow.services.warehouse.model.OrderItemInfoResponse;
 import ru.romanow.services.warehouse.model.OrderItemRequest;
 import ru.romanow.services.warehouse.repository.ItemRepository;
 import ru.romanow.services.warehouse.repository.OrderItemRepository;
-import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
-import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,6 +37,15 @@ public class WarehouseServiceImpl
                 .findItemByUid(itemId)
                 .map(orderItem -> buildOrderItemInfo(itemId, orderItem.getItem()))
                 .orElse(null);
+    }
+
+    @Nonnull
+    @Override
+    @Transactional(readOnly = true)
+    public OrderItem getOrderItem(@Nonnull UUID itemId) {
+        return orderItemRepository
+                .findItemByUid(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Item '" + itemId + "' not found"));
     }
 
     @Nonnull
@@ -87,10 +94,11 @@ public class WarehouseServiceImpl
         orderItemRepository.returnOrderItem(itemId);
     }
 
-    @Nonnull
     @Override
-    public OrderWarrantyResponse warrantyRequest(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request) {
-        return null;
+    @Transactional(readOnly = true)
+    public int checkItemAvailableCount(@Nonnull UUID itemId) {
+        final OrderItem orderItem = getOrderItem(itemId);
+        return orderItem.getItem().getAvailableCount();
     }
 
     @Nonnull

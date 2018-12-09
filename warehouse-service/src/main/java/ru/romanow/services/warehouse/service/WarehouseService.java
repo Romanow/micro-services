@@ -1,10 +1,10 @@
 package ru.romanow.services.warehouse.service;
 
+import org.springframework.transaction.annotation.Transactional;
+import ru.romanow.services.warehouse.domain.OrderItem;
 import ru.romanow.services.warehouse.model.ItemInfoResponse;
 import ru.romanow.services.warehouse.model.OrderItemInfoResponse;
 import ru.romanow.services.warehouse.model.OrderItemRequest;
-import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
-import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,6 +17,9 @@ public interface WarehouseService {
     OrderItemInfoResponse getItemInfo(@Nonnull UUID itemId);
 
     @Nonnull
+    OrderItem getOrderItem(@Nonnull UUID itemId);
+
+    @Nonnull
     List<ItemInfoResponse> getItemsInfo();
 
     @Nonnull
@@ -24,6 +27,5 @@ public interface WarehouseService {
 
     void returnItem(@Nonnull UUID itemId);
 
-    @Nonnull
-    OrderWarrantyResponse warrantyRequest(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request);
+    int checkItemAvailableCount(@Nonnull UUID itemId);
 }

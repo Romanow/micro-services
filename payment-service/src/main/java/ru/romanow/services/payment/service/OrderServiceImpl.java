@@ -42,7 +42,7 @@ public class OrderServiceImpl
     public void refundOrder(@Nonnull UUID orderId) {
         final Order order = paymentService.getOrderByUid(orderId);
         warehouseService.returnItem(orderId, order.getItemId());
-        warrantyService.cancelWarranty(order.getItemId());
+        warrantyService.stopWarranty(order.getItemId());
         paymentService.cancelPayment(orderId);
     }
 
