@@ -8,12 +8,22 @@ services:
       - 8781:8781
     environment:
       - SPRING_PROFILES_ACTIVE=peer1
+    networks:
+      - eureka-network
 
   eureka-2:
     build: ./eureka
     image: eureka:latest
     container_name: eureka-2
     ports:
-    - 8782:8782
+      - 8782:8782
     environment:
-    - SPRING_PROFILES_ACTIVE=peer2
+      - SPRING_PROFILES_ACTIVE=peer2
+    networks:
+      - eureka-network
+    depends_on:
+      - eureka-1
+
+networks:
+  eureka-network:
+    driver: bridge
