@@ -8,6 +8,7 @@ import ru.romanow.services.warranty.modal.enums.WarrantyStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -28,7 +29,7 @@ public class Warranty {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "warranty_date", nullable = false)
-    private LocalDateTime warrantyDate;
+    private Date warrantyDate;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

@@ -16,11 +16,18 @@ import ru.romanow.services.warranty.repository.WarrantyRepository;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.UUID;
 
 import static java.time.LocalDateTime.now;
+import static java.time.LocalDateTime.ofInstant;
+import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 @Service
 @AllArgsConstructor
@@ -35,7 +42,7 @@ public class WarrantyServiceImpl
     @Transactional(readOnly = true)
     public Warranty getWarrantyByItemId(@Nonnull UUID itemId) {
         return warrantyRepository.findWarrantyByItemId(itemId)
-                                 .orElseThrow(() -> new EntityNotFoundException("Warranty not found for itemId '" + itemId + "'"));
+                .orElseThrow(() -> new EntityNotFoundException("Warranty not found for itemId '" + itemId + "'"));
     }
 
     @Nullable
@@ -62,7 +69,7 @@ public class WarrantyServiceImpl
 
         return new OrderWarrantyResponse()
                 .setDecision(decision)
-                .setWarrantyDate(warranty.getWarrantyDate().format(DateTimeFormatter.ISO_DATE_TIME));
+                .setWarrantyDate(formatDate(warranty.getWarrantyDate()));
     }
 
     @Override
@@ -70,7 +77,7 @@ public class WarrantyServiceImpl
     public void startWarranty(@Nonnull UUID itemId) {
         Warranty warranty =
                 new Warranty()
-                        .setWarrantyDate(now())
+                        .setWarrantyDate(new Date())
                         .setItemId(itemId)
                         .setStatus(WarrantyStatus.ON_WARRANTY);
 
@@ -92,8 +99,8 @@ public class WarrantyServiceImpl
     private void updateWarranty(@Nonnull Warranty warranty, @Nonnull WarrantyDecision decision, @Nullable String reason) {
         warranty.setComment(reason);
         final WarrantyStatus status = decision == WarrantyDecision.REFUSE
-                                      ? WarrantyStatus.REMOVED_FROM_WARRANTY
-                                      : WarrantyStatus.USE_WARRANTY;
+                ? WarrantyStatus.REMOVED_FROM_WARRANTY
+                : WarrantyStatus.USE_WARRANTY;
         warranty.setStatus(status);
         warranty = warrantyRepository.save(warranty);
 
@@ -103,7 +110,8 @@ public class WarrantyServiceImpl
     }
 
     private boolean isActiveWarranty(@Nonnull Warranty warranty) {
-        return warranty.getWarrantyDate().isAfter(now().minus(1, ChronoUnit.MONTHS));
+        final LocalDateTime warrantyDate = ofInstant(warranty.getWarrantyDate().toInstant(), systemDefault());
+        return warrantyDate.isAfter(now().minus(1, ChronoUnit.MONTHS));
     }
 
     @Nonnull
@@ -111,6 +119,11 @@ public class WarrantyServiceImpl
         return new WarrantyInfoResponse()
                 .setItemId(warranty.getItemId())
                 .setStatus(warranty.getStatus())
-                .setWarrantyDate(warranty.getWarrantyDate().format(DateTimeFormatter.ISO_DATE_TIME));
+                .setWarrantyDate(formatDate(warranty.getWarrantyDate()));
+    }
+
+    @Nonnull
+    private String formatDate(@Nonnull Date warrantyDate) {
+        return ofInstant(warrantyDate.toInstant(), systemDefault()).format(ISO_DATE_TIME);
     }
 }

@@ -14,10 +14,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import static java.time.LocalDateTime.now;
+import static java.time.LocalDateTime.ofInstant;
+import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -63,7 +67,7 @@ public class OrderServiceImpl
         final Order order = new Order()
                 .setUserId(userId)
                 .setOrderId(orderId)
-                .setOrderDate(now())
+                .setOrderDate(new Date())
                 .setStatus(PaymentStatus.PAID)
                 .setItemId(itemId);
 
@@ -94,7 +98,12 @@ public class OrderServiceImpl
         return new OrderInfoResponse()
                 .setOrderId(order.getOrderId())
                 .setItemId(order.getItemId())
-                .setOrderDate(order.getOrderDate().format(DateTimeFormatter.ISO_DATE_TIME))
+                .setOrderDate(formatDate(order.getOrderDate()))
                 .setStatus(order.getStatus());
+    }
+
+    @Nonnull
+    private String formatDate(@Nonnull Date warrantyDate) {
+        return ofInstant(warrantyDate.toInstant(), systemDefault()).format(ISO_DATE_TIME);
     }
 }

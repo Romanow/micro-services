@@ -8,6 +8,7 @@ import ru.romanow.services.order.model.enums.PaymentStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -36,7 +37,7 @@ public class Order {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "order_date", nullable = false)
-    private LocalDateTime orderDate;
+    private Date orderDate;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
