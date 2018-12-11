@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WarrantyServiceImpl
         implements WarrantyService {
-    private static final String WARRANTY_SERVICE = "warranty-service";
+    private static final String WARRANTY_SERVICE = "http://warranty-service";
 
     private final WarehouseService warehouseService;
     private final RestTemplate restTemplate;

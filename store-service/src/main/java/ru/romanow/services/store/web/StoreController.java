@@ -21,21 +21,21 @@ public class StoreController {
     private StoreService storeService;
 
     @GetMapping(value = "/{userId}/orders", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private UserOrdersResponse orders(@RequestParam UUID userId) {
+    private UserOrdersResponse orders(@PathVariable UUID userId) {
         return storeService.findUserOrders(userId);
     }
 
     @GetMapping("/{userId}/{orderId}")
-    private UserOrderResponse orders(@RequestParam UUID userId, @RequestParam UUID orderId) {
+    private UserOrderResponse orders(@PathVariable UUID userId, @PathVariable UUID orderId) {
         return storeService.findUserOrder(userId, orderId);
     }
 
     @PostMapping(value = "/{userId}/purchase",
                  consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
                  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private void purchase(@RequestParam UUID userId,
-                                      @RequestBody @Valid PurchaseRequest request,
-                                      HttpServletResponse servletResponse) {
+    private void purchase(@PathVariable UUID userId,
+                          @RequestBody @Valid PurchaseRequest request,
+                          HttpServletResponse servletResponse) {
         final UUID orderId = storeService.makePurchase(userId, request);
         servletResponse.setHeader(HttpHeaders.LOCATION, format("/%s/%s/", userId, orderId));
     }
@@ -44,16 +44,16 @@ public class StoreController {
     @DeleteMapping(value = "/{userId}/{orderId}/refund",
                    consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
                    produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private void purchase(@RequestParam UUID userId,
-                          @RequestParam UUID orderId) {
+    private void purchase(@PathVariable UUID userId,
+                          @PathVariable UUID orderId) {
         storeService.refundPurchase(userId, orderId);
     }
 
     @PostMapping(value = "/{userId}/{orderId}/warranty",
                  consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
                  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private WarrantyResponse purchase(@RequestParam UUID userId,
-                                      @RequestParam UUID orderId,
+    private WarrantyResponse purchase(@PathVariable UUID userId,
+                                      @PathVariable UUID orderId,
                                       @RequestBody @Valid WarrantyRequest request) {
         return storeService.warrantyRequest(userId, orderId, request);
     }

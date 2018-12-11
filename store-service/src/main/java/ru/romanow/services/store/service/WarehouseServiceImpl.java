@@ -17,7 +17,7 @@ import java.util.UUID;
 public class WarehouseServiceImpl
         implements WarehouseService {
     private static final Logger logger = LoggerFactory.getLogger(WarehouseService.class);
-    private static final String WAREHOUSE_SERVICE = "warehouse-service";
+    private static final String WAREHOUSE_SERVICE = "http://warehouse-service";
     private final RestTemplate restTemplate;
 
     @Nonnull
@@ -27,8 +27,11 @@ public class WarehouseServiceImpl
         return Optional.ofNullable(restTemplate.getForObject(WAREHOUSE_SERVICE + "/api/" + itemId, OrderItemInfoResponse.class));
     }
 
-    private Optional<OrderItemInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId) {
-        logger.warn("Request to '%s/api/%s/%s failed. Use fallback", WAREHOUSE_SERVICE, itemId);
+    private Optional<OrderItemInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId, Throwable throwable) {
+        logger.warn("Request to '{}/api/{}/{} failed with exception: {}. Use fallback", WAREHOUSE_SERVICE, itemId, throwable.getMessage());
+        if (logger.isDebugEnabled()) {
+            logger.debug("", throwable);
+        }
         return Optional.of(new OrderItemInfoResponse().setItemId(itemId));
     }
 }

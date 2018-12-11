@@ -20,13 +20,13 @@ public class WarrantyController {
     private final WarrantyService warrantyService;
 
     @GetMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private WarrantyInfoResponse warrantyInfo(@RequestParam UUID itemId) {
+    private WarrantyInfoResponse warrantyInfo(@PathVariable UUID itemId) {
         return warrantyService.getWarrantyInfo(itemId);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/{itemId}")
-    private void startWarranty(@RequestParam UUID itemId) {
+    private void startWarranty(@PathVariable UUID itemId) {
         warrantyService.startWarranty(itemId);
     }
 

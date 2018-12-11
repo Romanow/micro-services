@@ -21,7 +21,7 @@ public class DatabaseConfiguration {
         return Flyway
                 .configure()
                 .dataSource(dataSource)
-                .locations("classpath:db/migration")
+                .locations("classpath:db/migrations")
                 .outOfOrder(true)
                 .baselineOnMigrate(true)
                 .load();

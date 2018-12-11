@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WarehouseServiceImpl
         implements WarehouseService {
-    private static final String WAREHOUSE_SERVICE = "warehouse-service";
+    private static final String WAREHOUSE_SERVICE = "http://warehouse-service";
     private final RestTemplate restTemplate;
 
     @Nonnull

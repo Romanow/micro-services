@@ -17,7 +17,7 @@ import java.util.UUID;
 public class WarrantyServiceImpl
         implements WarrantyService {
     private static final Logger logger = LoggerFactory.getLogger(WarehouseService.class);
-    private static final String WARRANTY_SERVICE = "warranty-service";
+    private static final String WARRANTY_SERVICE = "http://warranty-service";
 
     private final RestTemplate restTemplate;
 
@@ -28,8 +28,11 @@ public class WarrantyServiceImpl
         return Optional.ofNullable(restTemplate.getForObject(WARRANTY_SERVICE + "/api/" + itemId, WarrantyInfoResponse.class));
     }
 
-    public Optional<WarrantyInfoResponse> getItemWarrantyInfoFallback(@Nonnull UUID itemId) {
-        logger.warn("Request to '%s/api/%s/%s failed. Use fallback", WARRANTY_SERVICE, itemId);
+    public Optional<WarrantyInfoResponse> getItemWarrantyInfoFallback(@Nonnull UUID itemId, Throwable throwable) {
+        logger.warn("Request to '{}/api/{}/{} failed with exception: {}. Use fallback", WARRANTY_SERVICE, itemId, throwable.getMessage());
+        if (logger.isDebugEnabled()) {
+            logger.debug("", throwable);
+        }
         return Optional.of(new WarrantyInfoResponse().setItemId(itemId));
     }
 }

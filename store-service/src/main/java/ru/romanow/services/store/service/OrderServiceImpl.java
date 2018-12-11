@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
 
 @Service
 @AllArgsConstructor
@@ -27,7 +28,7 @@ public class OrderServiceImpl
         implements OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
-    private static final String ORDER_SERVICE = "order-service";
+    private static final String ORDER_SERVICE = "http://order-service";
     private final RestTemplate restTemplate;
 
     @Nonnull
@@ -68,14 +69,20 @@ public class OrderServiceImpl
     }
 
     @Nonnull
-    private Optional<OrderInfoResponse> getOrderInfoFallback(@Nonnull UUID userId, @Nonnull UUID orderId) {
-        logger.warn("Request to GET '%s/api/%s/%s failed. Use fallback", ORDER_SERVICE, userId, orderId);
+    private Optional<OrderInfoResponse> getOrderInfoFallback(@Nonnull UUID userId, @Nonnull UUID orderId, Throwable throwable) {
+        logger.warn("Request to GET '{}/api/%s/{} failed with exception: {}. Use fallback", ORDER_SERVICE, userId, orderId, throwable.getMessage());
+        if (logger.isDebugEnabled()) {
+            logger.debug("", throwable);
+        }
         return Optional.of(new OrderInfoResponse().setOrderId(orderId));
     }
 
     @Nonnull
-    private Optional<List<OrderInfoResponse>> getOrderInfoByUserFallback(@Nonnull UUID userId) {
-        logger.warn("Request to GET '%s/api/%s failed. Use fallback", ORDER_SERVICE, userId);
+    private Optional<List<OrderInfoResponse>> getOrderInfoByUserFallback(@Nonnull UUID userId, Throwable throwable) {
+        logger.warn("Request to GET '{}/api/{} failed with exception: {}. Use fallback", ORDER_SERVICE, userId, throwable.getMessage());
+        if (logger.isDebugEnabled()) {
+            logger.debug("", throwable);
+        }
         return Optional.of(newArrayList());
     }
 }

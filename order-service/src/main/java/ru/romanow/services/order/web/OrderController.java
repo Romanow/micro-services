@@ -23,33 +23,33 @@ public class OrderController {
     private final OrderManagementService orderManagementService;
 
     @GetMapping(value = "/{userId}/{orderId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private OrderInfoResponse userOrder(@RequestParam UUID userId, @RequestParam UUID orderId) {
+    private OrderInfoResponse userOrder(@PathVariable UUID userId, @PathVariable UUID orderId) {
         return orderService.getUserOrder(userId, orderId);
     }
 
-    @GetMapping(value = "/{userId}/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private List<OrderInfoResponse> userOrders(@RequestParam UUID userId) {
+    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    private List<OrderInfoResponse> userOrders(@PathVariable UUID userId) {
         return orderService.getUserOrders(userId);
     }
 
-    @PostMapping(value = "/{userId}/",
+    @PostMapping(value = "/{userId}",
                  consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
                  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private UUID makeOrder(@RequestParam UUID userId,
+    private UUID makeOrder(@PathVariable UUID userId,
                            @RequestBody @Valid CreateOrderRequest request) {
         return orderManagementService.makeOrder(userId, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/{orderId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private void refundOrder(@RequestParam UUID orderId) {
+    private void refundOrder(@PathVariable UUID orderId) {
         orderManagementService.refundOrder(orderId);
     }
 
     @PostMapping(value = "/{orderId}/warranty",
                  consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
                  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private OrderWarrantyResponse warranty(@RequestParam UUID orderId,
+    private OrderWarrantyResponse warranty(@PathVariable UUID orderId,
                                            @RequestBody @Valid OrderWarrantyRequest request) {
         return orderManagementService.checkWarranty(orderId, request);
     }
