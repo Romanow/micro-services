@@ -32,6 +32,6 @@ public class WarehouseServiceImpl
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }
-        return Optional.of(new OrderItemInfoResponse().setItemId(itemId));
+        return Optional.empty();
     }
 }

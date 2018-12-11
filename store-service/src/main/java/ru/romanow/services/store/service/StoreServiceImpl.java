@@ -46,12 +46,12 @@ public class StoreServiceImpl
 
                 final UUID itemId = orderInfo.getItemId();
                 warehouseService.getItemInfo(itemId)
-                                .map(info -> order
+                                .ifPresent(info -> order
                                         .setModel(info.getModel())
                                         .setSize(convertToStoreSize(info.getSize())));
 
                 warrantyService.getItemWarrantyInfo(itemId)
-                               .map(warrantyInfo -> order
+                               .ifPresent(warrantyInfo -> order
                                        .setWarrantyDate(warrantyInfo.getWarrantyDate())
                                        .setWarrantyStatus(convertToStoreWarrantyStatus(warrantyInfo.getStatus())));
 
@@ -77,12 +77,12 @@ public class StoreServiceImpl
             final UUID itemId = orderInfo.get().getItemId();
             orderResponse.setDate(orderInfo.get().getOrderDate());
             warehouseService.getItemInfo(itemId)
-                            .map(info -> orderResponse
+                            .ifPresent(info -> orderResponse
                                     .setModel(info.getModel())
                                     .setSize(convertToStoreSize(info.getSize())));
 
             warrantyService.getItemWarrantyInfo(itemId)
-                           .map(warrantyInfo -> orderResponse
+                           .ifPresent(warrantyInfo -> orderResponse
                                    .setWarrantyDate(warrantyInfo.getWarrantyDate())
                                    .setWarrantyStatus(convertToStoreWarrantyStatus(warrantyInfo.getStatus())));
         }

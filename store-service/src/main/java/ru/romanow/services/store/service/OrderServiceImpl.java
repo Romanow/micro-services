@@ -74,7 +74,7 @@ public class OrderServiceImpl
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }
-        return Optional.of(new OrderInfoResponse().setOrderId(orderId));
+        return Optional.empty();
     }
 
     @Nonnull

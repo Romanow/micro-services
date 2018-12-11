@@ -12,7 +12,9 @@ import java.util.UUID;
 
 public interface ItemRepository
         extends JpaRepository<Item, Integer> {
-    Optional<Item> findItemByModelAndSize(String model, SizeChart size);
+
+    @Query("select i from Item i where i.model = :model and i.size = :size")
+    Optional<Item> findItemByModelAndSize(@Param("model") String model, @Param("size") SizeChart size);
 
     @Modifying
     @Query("update Item set availableCount = availableCount - 1 where id = :id")
