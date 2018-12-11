@@ -12,7 +12,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 public class OrderItemRequest {
 
-    @NotEmpty(message = "{field.is.empty")
+    @NotNull(message = "{field.is.null")
     private UUID orderId;
 
     @NotEmpty(message = "{field.is.empty")

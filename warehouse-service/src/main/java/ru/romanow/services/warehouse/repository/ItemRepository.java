@@ -20,6 +20,6 @@ public interface ItemRepository
 
     @Query("update Item " +
                    "set availableCount = availableCount + 1 " +
-                   "where id = (select item_id from OrderItem where uid = :itemId)")
+                   "where id = (select id from OrderItem where uid = :itemId)")
     void returnOneItem(@Param("itemId") UUID itemId);
 }
