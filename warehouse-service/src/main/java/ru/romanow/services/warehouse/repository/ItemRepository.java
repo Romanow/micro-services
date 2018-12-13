@@ -20,6 +20,7 @@ public interface ItemRepository
     @Query("update Item set availableCount = availableCount - 1 where id = :id")
     void takeOneItem(@Param("id") Integer id);
 
+    @Modifying
     @Query("update Item " +
                    "set availableCount = availableCount + 1 " +
                    "where id = (select id from OrderItem where uid = :itemId)")

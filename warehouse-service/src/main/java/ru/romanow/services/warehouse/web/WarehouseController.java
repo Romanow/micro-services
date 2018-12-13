@@ -45,7 +45,7 @@ public class WarehouseController {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PostMapping("/{itemId}")
+    @PostMapping("/{itemId}/warranty")
     public OrderWarrantyResponse warranty(@PathVariable UUID itemId, @RequestBody @Valid OrderWarrantyRequest request) {
         return warrantyService.warrantyRequest(itemId, request);
     }

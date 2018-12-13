@@ -52,7 +52,7 @@ public class StoreController {
     @PostMapping(value = "/{userId}/{orderId}/warranty",
                  consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
                  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private WarrantyResponse purchase(@PathVariable UUID userId,
+    private WarrantyResponse warranty(@PathVariable UUID userId,
                                       @PathVariable UUID orderId,
                                       @RequestBody @Valid WarrantyRequest request) {
         return storeService.warrantyRequest(userId, orderId, request);

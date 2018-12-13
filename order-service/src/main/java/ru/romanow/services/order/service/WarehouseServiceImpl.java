@@ -2,6 +2,7 @@ package ru.romanow.services.order.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
+import org.springframework.cloud.sleuth.SpanName;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.romanow.services.order.model.enums.SizeChart;
@@ -34,11 +35,13 @@ public class WarehouseServiceImpl
     @Override
     @HystrixCommand
     public void returnItem(@Nonnull UUID orderId, @Nonnull UUID itemId) {
-        restTemplate.delete(WAREHOUSE_SERVICE + "/api/" + orderId + "/" + itemId);
+        restTemplate.delete(WAREHOUSE_SERVICE + "/api/" + itemId);
     }
 
+    @Nonnull
     @Override
     @HystrixCommand
+    @SpanName("WH check warranty")
     public Optional<OrderWarrantyResponse> checkWarrantyItem(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request) {
         return Optional.ofNullable(restTemplate.postForObject(WAREHOUSE_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class));
     }

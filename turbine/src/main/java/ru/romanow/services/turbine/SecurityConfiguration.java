@@ -15,7 +15,7 @@ public class SecurityConfiguration
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/**").authenticated()
+                .antMatchers("/hystrix/**").authenticated()
                 .and()
                 .httpBasic()
                 .and()

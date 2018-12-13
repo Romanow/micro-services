@@ -14,6 +14,6 @@ public interface OrderItemRepository
     Optional<OrderItem> findItemByUid(UUID uid);
 
     @Modifying
-    @Query("delete from OrderItem where id = :itemId")
+    @Query("delete from OrderItem where uid = :itemId")
     void returnOrderItem(@Param("itemId") UUID itemId);
 }
