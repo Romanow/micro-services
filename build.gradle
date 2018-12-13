@@ -55,6 +55,7 @@ configure(subprojects) { project ->
             compile "org.springframework.cloud:spring-cloud-netflix-eureka-client"
             compile "org.springframework.cloud:spring-cloud-starter-netflix-ribbon"
             compile "org.springframework.cloud:spring-cloud-starter-netflix-hystrix"
+            compile "org.springframework.cloud:spring-cloud-starter-zipkin"
 
             compile "com.netflix.eureka:eureka-client"
             compile "com.netflix.ribbon:ribbon-eureka"

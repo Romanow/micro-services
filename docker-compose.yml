@@ -24,6 +24,24 @@ services:
     depends_on:
       - eureka-1
 
+  turbine:
+    build: ./turbine
+    image: turbine:latest
+    container_name: turbine
+    ports:
+      - 8010:8010
+    networks:
+      - turbine-network
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - 9411:9411
+    networks:
+      - zipkin-network
+
 networks:
   eureka-network:
-    driver: bridge
+  zipkin-network:
+  turbine-network:
