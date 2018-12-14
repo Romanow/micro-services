@@ -1,6 +1,8 @@
 package ru.romanow.services.store.service;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.services.order.model.OrderInfoResponse;
 import ru.romanow.services.store.exceptions.OrderProcessException;
@@ -24,6 +26,8 @@ import static java.lang.String.format;
 @AllArgsConstructor
 public class StoreServiceImpl
         implements StoreService {
+    private static final Logger logger = LoggerFactory.getLogger(StoreService.class);
+
     private final UserService userService;
     private final WarehouseService warehouseService;
     private final OrderService orderService;
@@ -38,18 +42,23 @@ public class StoreServiceImpl
         final List<UserOrderResponse> orders = new ArrayList<>();
         final Optional<List<OrderInfoResponse>> userOrders = orderService.getOrderInfoByUser(userId);
         if (userOrders.isPresent()) {
+            logger.info("User '{}' has {} orders", userId, userOrders.get().size());
+
             for (OrderInfoResponse orderInfo : userOrders.get()) {
+                logger.info("Processing user '{}' order '{}'", userId, orderInfo.getOrderId());
                 final UserOrderResponse order =
                         new UserOrderResponse()
                                 .setOrderId(orderInfo.getOrderId())
                                 .setDate(orderInfo.getOrderDate());
 
                 final UUID itemId = orderInfo.getItemId();
+                logger.debug("Request to WH for item '{}' info by order '{}'", itemId, orderInfo.getOrderId());
                 warehouseService.getItemInfo(itemId)
                                 .ifPresent(info -> order
                                         .setModel(info.getModel())
                                         .setSize(convertToStoreSize(info.getSize())));
 
+                logger.debug("Request to Warranty for item '{}' info by order '{}'", itemId, orderInfo.getOrderId());
                 warrantyService.getItemWarrantyInfo(itemId)
                                .ifPresent(warrantyInfo -> order
                                        .setWarrantyDate(warrantyInfo.getWarrantyDate())
@@ -57,6 +66,8 @@ public class StoreServiceImpl
 
                 orders.add(order);
             }
+        } else {
+            logger.info("User '{}' has no orders", userId);
         }
 
         return new UserOrdersResponse(orders);

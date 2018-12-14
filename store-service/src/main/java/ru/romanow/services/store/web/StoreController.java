@@ -2,6 +2,8 @@ package ru.romanow.services.store.web;
 
 import com.google.common.net.HttpHeaders;
 import lombok.AllArgsConstructor;
+import org.springframework.cloud.sleuth.SpanName;
+import org.springframework.cloud.sleuth.annotation.NewSpan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
