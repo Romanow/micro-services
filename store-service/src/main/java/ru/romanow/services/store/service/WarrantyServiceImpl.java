@@ -30,7 +30,7 @@ public class WarrantyServiceImpl
     }
 
     public Optional<WarrantyInfoResponse> getItemWarrantyInfoFallback(@Nonnull UUID itemId, Throwable throwable) {
-        logger.warn("Request to '{}/api/{} failed with exception: {}. Use fallback", WARRANTY_SERVICE, itemId, throwable.getMessage());
+        logger.warn("Request to '{}/api/{}' failed with exception: {}. Use fallback", WARRANTY_SERVICE, itemId, throwable.getMessage());
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }

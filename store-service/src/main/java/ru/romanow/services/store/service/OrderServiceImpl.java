@@ -71,7 +71,7 @@ public class OrderServiceImpl
 
     @Nonnull
     private Optional<OrderInfoResponse> getOrderInfoFallback(@Nonnull UUID userId, @Nonnull UUID orderId, Throwable throwable) {
-        logger.warn("Request to GET '{}/api/%s/{} failed with exception: {}. Use fallback", ORDER_SERVICE, userId, orderId, throwable.getMessage());
+        logger.warn("Request to GET '{}/api/{}/{}' failed with exception: {}. Use fallback", ORDER_SERVICE, userId, orderId, throwable.getMessage());
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }
@@ -80,7 +80,7 @@ public class OrderServiceImpl
 
     @Nonnull
     private Optional<List<OrderInfoResponse>> getOrderInfoByUserFallback(@Nonnull UUID userId, Throwable throwable) {
-        logger.warn("Request to GET '{}/api/{} failed with exception: {}. Use fallback", ORDER_SERVICE, userId, throwable.getMessage());
+        logger.warn("Request to GET '{}/api/{}' failed with exception: {}. Use fallback", ORDER_SERVICE, userId, throwable.getMessage());
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }

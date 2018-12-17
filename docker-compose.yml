@@ -33,15 +33,15 @@ services:
   #    networks:
   #      - eureka-network
 
-#  zipkin:
-#    image: openzipkin/zipkin
-#    container_name: zipkin
-#    ports:
-#    - 9411:9411
-#    environment:
-#    - STORAGE_TYPE=mem
-#    networks:
-#    - zipkin-network
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+    - 9411:9411
+    environment:
+    - STORAGE_TYPE=mem
+    networks:
+    - zipkin-network
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.0
@@ -78,7 +78,7 @@ services:
     ports:
     - "5601:5601"
     volumes:
-    - ./elk/kibana/elasticsearch.yml:/usr/share/kibana/config/elasticsearch.yml:ro
+    - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     networks:
     - elk
 

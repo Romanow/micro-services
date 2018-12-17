@@ -29,7 +29,7 @@ public class WarehouseServiceImpl
     }
 
     private Optional<OrderItemInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId, Throwable throwable) {
-        logger.warn("Request to '{}/api/{}/{} failed with exception: {}. Use fallback", WAREHOUSE_SERVICE, itemId, throwable.getMessage());
+        logger.warn("Request to '{}/api/{}' failed with exception: {}. Use fallback", WAREHOUSE_SERVICE, itemId, throwable.getMessage());
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }
