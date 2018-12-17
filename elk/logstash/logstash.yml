@@ -1,5 +1,5 @@
 http:
-    host: "0.0.0.0"
+  host: "0.0.0.0"
 
 path:
-    config: /usr/share/logstash/pipeline
+  config: /usr/share/logstash/pipeline

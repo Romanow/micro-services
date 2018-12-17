@@ -60,6 +60,9 @@ configure(subprojects) { project ->
             compile "com.netflix.eureka:eureka-client"
             compile "com.netflix.ribbon:ribbon-eureka"
 
+            compile "ch.qos.logback:logback-classic"
+            compile "net.logstash.logback:logstash-logback-encoder:${logstahVersion}"
+            
             compile "org.postgresql:postgresql"
             compile "org.flywaydb:flyway-core"
 

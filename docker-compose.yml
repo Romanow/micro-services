@@ -1,28 +1,28 @@
 version: '3.3'
 services:
-#  eureka-1:
-#    build: ./eureka
-#    image: eureka:latest
-#    container_name: eureka-1
-#    ports:
-#    - 8781:8781
-#    environment:
-#    - SPRING_PROFILES_ACTIVE=peer1
-#    networks:
-#    - eureka-network
-#
-#  eureka-2:
-#    build: ./eureka
-#    image: eureka:latest
-#    container_name: eureka-2
-#    ports:
-#    - 8782:8782
-#    environment:
-#    - SPRING_PROFILES_ACTIVE=peer2
-#    networks:
-#    - eureka-network
-#    depends_on:
-#    - eureka-1
+  eureka-1:
+    build: ./eureka
+    image: eureka:latest
+    container_name: eureka-1
+    ports:
+    - 8781:8781
+    environment:
+    - SPRING_PROFILES_ACTIVE=peer1
+    networks:
+    - eureka-network
+
+  eureka-2:
+    build: ./eureka
+    image: eureka:latest
+    container_name: eureka-2
+    ports:
+    - 8782:8782
+    environment:
+    - SPRING_PROFILES_ACTIVE=peer2
+    networks:
+    - eureka-network
+    depends_on:
+    - eureka-1
 
   #  turbine:
   #    build: ./turbine
@@ -45,12 +45,12 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.0
+    container_name: elastic
+    volumes:
+    - ./elk/elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ports:
     - "9200:9200"
     - "9300:9300"
-    configs:
-    - source: elastic_config
-      target: /usr/share/elasticsearch/config/elasticsearch.yml
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
@@ -58,13 +58,12 @@ services:
 
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:6.4.0
-    configs:
-    - source: logstash_config
-      target: /usr/share/logstash/config/logstash.yml
-    - source: logstash_pipeline
-      target: /usr/share/logstash/pipeline/logstash.conf
+    container_name: logstash
+    volumes:
+    - ./elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+    - ./elk/logstash/pipelines.conf:/usr/share/logstash/pipeline/logstash.conf:ro
     ports:
-    - "5000:5000"
+    - "4560:4560"
     - "9600:9600"
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
@@ -75,23 +74,13 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:6.4.0
+    container_name: kibana
     ports:
     - "5601:5601"
-    configs:
-    - source: kibana_config
-      target: /usr/share/kibana/config/elasticsearch.yml
+    volumes:
+    - ./elk/kibana/elasticsearch.yml:/usr/share/kibana/config/elasticsearch.yml:ro
     networks:
     - elk
-
-configs:
-  elastic_config:
-    file: ./elk/elastic/elasticsearch.yml
-  logstash_config:
-    file: ./elk/logstash/logstash.yml
-  logstash_pipeline:
-    file: ./elk/logstash/pipeline.conf
-  kibana_config:
-    file: ./elk/kibana/kibana.yml
 
 networks:
   eureka-network:
