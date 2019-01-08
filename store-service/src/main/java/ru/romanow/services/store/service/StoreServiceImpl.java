@@ -36,14 +36,20 @@ public class StoreServiceImpl
     @Nonnull
     @Override
     public UserOrdersResponse findUserOrders(@Nonnull UUID userId) {
+        logger.info("Get user '{}' orders", userId);
         if (!userService.checkUserExists(userId)) {
             throw new UserNotFoundException(format("User '%s' not found", userId));
         }
+
         final List<UserOrderResponse> orders = new ArrayList<>();
-        final Optional<List<OrderInfoResponse>> userOrders = orderService.getOrderInfoByUser(userId);
+        logger.debug("Request to OrderService for user '{}' orders", userId);
+        final Optional<List<OrderInfoResponse>> userOrders =
+                orderService.getOrderInfoByUser(userId);
+
         if (userOrders.isPresent()) {
             logger.info("User '{}' has {} orders", userId, userOrders.get().size());
 
+            // TODO переделать на batch-операции
             for (OrderInfoResponse orderInfo : userOrders.get()) {
                 logger.info("Processing user '{}' order '{}'", userId, orderInfo.getOrderId());
                 final UserOrderResponse order =
@@ -67,7 +73,7 @@ public class StoreServiceImpl
                 orders.add(order);
             }
         } else {
-            logger.info("User '{}' has no orders", userId);
+            logger.warn("User '{}' has no orders", userId);
         }
 
         return new UserOrdersResponse(orders);
@@ -76,26 +82,35 @@ public class StoreServiceImpl
     @Nonnull
     @Override
     public UserOrderResponse findUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId) {
+        logger.info("Get info for user '{}' order '{}'", userId, orderId);
         if (!userService.checkUserExists(userId)) {
             throw new UserNotFoundException(format("User '%s' not found", userId));
         }
 
-        final Optional<OrderInfoResponse> orderInfo = orderService.getOrderInfo(userId, orderId);
-
+        logger.debug("Request to OrderService for user '{}' order '{}'", userId, orderId);
+        final Optional<OrderInfoResponse> orderInfo =
+                orderService.getOrderInfo(userId, orderId);
         final UserOrderResponse orderResponse =
                 new UserOrderResponse().setOrderId(orderId);
+
         if (orderInfo.isPresent()) {
+            logger.info("Processing user '{}' order '{}'", userId, orderId);
+
             final UUID itemId = orderInfo.get().getItemId();
             orderResponse.setDate(orderInfo.get().getOrderDate());
+            logger.debug("Request to WH for item '{}' info by order '{}'", itemId, orderId);
             warehouseService.getItemInfo(itemId)
                             .ifPresent(info -> orderResponse
                                     .setModel(info.getModel())
                                     .setSize(convertToStoreSize(info.getSize())));
 
+            logger.debug("Request to WarrantyService for item '{}' info by order '{}'", itemId, orderId);
             warrantyService.getItemWarrantyInfo(itemId)
                            .ifPresent(warrantyInfo -> orderResponse
                                    .setWarrantyDate(warrantyInfo.getWarrantyDate())
                                    .setWarrantyStatus(convertToStoreWarrantyStatus(warrantyInfo.getStatus())));
+        } else {
+            logger.warn("User '{}' has no order '{}'", userId, orderId);
         }
 
         return orderResponse;
@@ -104,10 +119,12 @@ public class StoreServiceImpl
     @Nullable
     @Override
     public UUID makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request) {
+        logger.info("Process user '{}' purchase request '{}'", userId, request);
         if (!userService.checkUserExists(userId)) {
             throw new UserNotFoundException(format("User '%s' not found", userId));
         }
 
+        logger.info("Request to OrderService for user '{}' to process order '{}'", userId, request);
         return orderService
                 .makePurchase(userId, request)
                 .orElseThrow(() -> new OrderProcessException("Order not created"));
@@ -115,20 +132,24 @@ public class StoreServiceImpl
 
     @Override
     public void refundPurchase(@Nonnull UUID userId, @Nonnull UUID orderId) {
+        logger.info("Process user '{}' return request for order '{}'", userId, orderId);
         if (!userService.checkUserExists(userId)) {
             throw new UserNotFoundException(format("User '%s' not found", userId));
         }
 
+        logger.info("Request to OrderService for user '{}' to cancel order '{}'", userId, orderId);
         orderService.refundPurchase(orderId);
     }
 
     @Nonnull
     @Override
     public WarrantyResponse warrantyRequest(@Nonnull UUID userId, @Nonnull UUID orderId, @Nonnull WarrantyRequest request) {
+        logger.info("Process user '{}' warranty request for order '{}'", userId, orderId);
         if (!userService.checkUserExists(userId)) {
             throw new UserNotFoundException(format("User '%s' not found", userId));
         }
 
+        logger.info("Request to OrderService for user '{}' and order '{}' to make warranty request ({})", userId, orderId, request.getReason());
         return orderService
                 .warrantyRequest(orderId, request)
                 .map(resp -> buildWarrantyResponse(orderId, resp))

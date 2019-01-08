@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import ru.romanow.services.warehouse.model.ItemInfoResponse;
 import ru.romanow.services.warehouse.model.OrderItemInfoResponse;
 import ru.romanow.services.warehouse.model.OrderItemRequest;
 import ru.romanow.services.warehouse.service.WarehouseService;
@@ -13,7 +12,6 @@ import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,11 +20,6 @@ import java.util.UUID;
 public class WarehouseController {
     private final WarehouseService warehouseService;
     private final WarrantyService warrantyService;
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private List<ItemInfoResponse> items() {
-        return warehouseService.getItemsInfo();
-    }
 
     @GetMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     private OrderItemInfoResponse item(@PathVariable UUID itemId) {

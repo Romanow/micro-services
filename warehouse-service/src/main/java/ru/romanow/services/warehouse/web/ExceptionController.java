@@ -21,7 +21,9 @@ public class ExceptionController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public @ResponseBody ErrorResponse handleBadRequest(MethodArgumentNotValidException exception) {
         String validationErrors = prepareValidationErrors(exception.getBindingResult().getFieldErrors());
-        logger.warn("Bad Request: {}", validationErrors);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Bad Request: {}", validationErrors);
+        }
         return new ErrorResponse(validationErrors);
     }
 

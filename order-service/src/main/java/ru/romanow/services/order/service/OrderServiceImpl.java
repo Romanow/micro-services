@@ -13,12 +13,10 @@ import ru.romanow.services.order.repository.OrderRepository;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.ofInstant;
 import static java.time.ZoneId.systemDefault;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -45,6 +43,7 @@ public class OrderServiceImpl
     @Override
     @Transactional(readOnly = true)
     public OrderInfoResponse getUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId) {
+        logger.info("Get info for user '{}' order '{}'", userId, orderId);
         return orderRepository
                 .findByUserIdAndOrderId(userId, orderId)
                 .map(this::buildOrderInfo)
@@ -55,10 +54,12 @@ public class OrderServiceImpl
     @Override
     @Transactional(readOnly = true)
     public List<OrderInfoResponse> getUserOrders(@Nonnull UUID userId) {
-        return orderRepository.findByUserId(userId)
-                              .stream()
-                              .map(this::buildOrderInfo)
-                              .collect(toList());
+        logger.info("Get info for user '{}' orders", userId);
+        return orderRepository
+                .findByUserId(userId)
+                .stream()
+                .map(this::buildOrderInfo)
+                .collect(toList());
     }
 
     @Override

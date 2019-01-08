@@ -17,9 +17,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
@@ -42,13 +39,14 @@ public class WarrantyServiceImpl
     @Transactional(readOnly = true)
     public Warranty getWarrantyByItemId(@Nonnull UUID itemId) {
         return warrantyRepository.findWarrantyByItemId(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("Warranty not found for itemId '" + itemId + "'"));
+                                 .orElseThrow(() -> new EntityNotFoundException("Warranty not found for itemId '" + itemId + "'"));
     }
 
     @Nullable
     @Override
     @Transactional(readOnly = true)
     public WarrantyInfoResponse getWarrantyInfo(@Nonnull UUID itemId) {
+        logger.info("Get warranty info fot item '{}'", itemId);
         return warrantyRepository
                 .findWarrantyByItemId(itemId)
                 .map(this::buildWarrantyInfo)
@@ -59,12 +57,17 @@ public class WarrantyServiceImpl
     @Override
     @Transactional
     public OrderWarrantyResponse warrantyRequest(@Nonnull UUID itemId, @Nonnull ItemWarrantyRequest request) {
+        logger.info("Process warranty request (reason: {}) for item '{}'", request.getReason(), itemId);
         final Warranty warranty = getWarrantyByItemId(itemId);
 
         WarrantyDecision decision = WarrantyDecision.REFUSE;
         if (isActiveWarranty(warranty) && warranty.getStatus() == WarrantyStatus.ON_WARRANTY) {
             decision = request.getAvailableCount() > 0 ? WarrantyDecision.RETURN : WarrantyDecision.FIXING;
         }
+
+        logger.info("Warranty decision on item '{}' is {} (count: {}, status: {})",
+                    itemId, decision, request.getAvailableCount(), warranty.getStatus());
+
         updateWarranty(warranty, decision, request.getReason());
 
         return new OrderWarrantyResponse()
@@ -75,6 +78,8 @@ public class WarrantyServiceImpl
     @Override
     @Transactional
     public void startWarranty(@Nonnull UUID itemId) {
+        logger.info("Start warranty for item '{}'", itemId);
+
         Warranty warranty =
                 new Warranty()
                         .setWarrantyDate(new Date())
@@ -90,6 +95,8 @@ public class WarrantyServiceImpl
     @Override
     @Transactional
     public void stopWarranty(@Nonnull UUID itemId) {
+        logger.info("Remove item '{}' from warranty", itemId);
+
         final int deleted = warrantyRepository.stopWarranty(itemId);
         if (logger.isDebugEnabled()) {
             logger.debug("Deleted {} warranty", deleted);
@@ -98,9 +105,15 @@ public class WarrantyServiceImpl
 
     private void updateWarranty(@Nonnull Warranty warranty, @Nonnull WarrantyDecision decision, @Nullable String reason) {
         warranty.setComment(reason);
-        final WarrantyStatus status = decision == WarrantyDecision.REFUSE
+        final WarrantyStatus status =
+                decision == WarrantyDecision.REFUSE
                 ? WarrantyStatus.REMOVED_FROM_WARRANTY
                 : WarrantyStatus.USE_WARRANTY;
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Set warranty status {} on item '{}'", status, warranty.getItemId());
+        }
+
         warranty.setStatus(status);
         warranty = warrantyRepository.save(warranty);
 

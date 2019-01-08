@@ -20,9 +20,6 @@ public interface WarehouseService {
     OrderItem getOrderItem(@Nonnull UUID itemId);
 
     @Nonnull
-    List<ItemInfoResponse> getItemsInfo();
-
-    @Nonnull
     UUID takeItem(@Nonnull OrderItemRequest request);
 
     void returnItem(@Nonnull UUID itemId);

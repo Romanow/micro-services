@@ -1,4 +1,4 @@
-package ru.romanow.services.store.web;
+package ru.romanow.services.warranty.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import ru.romanow.services.store.exceptions.OrderProcessException;
-import ru.romanow.services.store.exceptions.UserNotFoundException;
-import ru.romanow.services.store.model.ErrorResponse;
-import ru.romanow.services.store.service.WarrantyProcessException;
+import ru.romanow.services.warranty.modal.ErrorResponse;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -21,7 +18,8 @@ public class ExceptionController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public @ResponseBody ErrorResponse handleBadRequest(MethodArgumentNotValidException exception) {
+    public @ResponseBody
+    ErrorResponse handleBadRequest(MethodArgumentNotValidException exception) {
         String validationErrors = prepareValidationErrors(exception.getBindingResult().getFieldErrors());
         if (logger.isDebugEnabled()) {
             logger.debug("Bad Request: {}", validationErrors);
@@ -30,14 +28,8 @@ public class ExceptionController {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({UserNotFoundException.class, EntityNotFoundException.class})
+    @ExceptionHandler(EntityNotFoundException.class)
     public @ResponseBody ErrorResponse handleNotFound(RuntimeException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler({WarrantyProcessException.class, OrderProcessException.class})
-    public @ResponseBody ErrorResponse conflict(RuntimeException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 
