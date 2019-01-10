@@ -1,0 +1,169 @@
+version: '3.7'
+
+# Specifying a custom network value in Docker swarm and using spring.cloud.inetutils.preferredNetworks property
+# Using eureka.instance.hostName: service-name and eureka.instance.preferIpAddress: false,
+# where service-name is the same service-name specified in the Docker compose file
+
+services:
+  eureka-1:
+    build: ./eureka
+    image: eureka:latest
+    container_name: eureka-1
+    ports:
+      - 8781:8781
+    environment:
+      - SPRING_PROFILES_ACTIVE=peer1
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  eureka-2:
+    build: ./eureka
+    image: eureka:latest
+    container_name: eureka-2
+    ports:
+      - 8782:8782
+    environment:
+      - SPRING_PROFILES_ACTIVE=peer2
+    depends_on:
+      - eureka-1
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  postgres:
+    image: postgres:10.6
+    container_name: postgres
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres/:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  store-service:
+    build: ./store-service
+    image: store-service:last
+    container_name: store-service
+    ports:
+      - 8090:8090
+    deploy:
+#      placement:
+#        constraints: [node.role == worker]
+
+  order-service:
+    build: ./order-service
+    image: order-service:last
+    container_name: order-service
+    ports:
+      - 8070:8070
+    deploy:
+#      placement:
+#        constraints: [node.role == worker]
+
+  warehouse-service:
+    build: ./warehouse-service
+    image: warehouse-service:last
+    container_name: warehouse-service
+    ports:
+      - 8060:8060
+    deploy:
+#      placement:
+#        constraints: [node.role == worker]
+
+  warranty-service:
+    build: ./warranty-service
+    image: warranty-service:last
+    container_name: warranty-service
+    ports:
+      - 8050:8050
+    deploy:
+#      placement:
+#        constraints: [node.role == worker]
+
+  turbine:
+    build: ./turbine
+    image: turbine:latest
+    container_name: turbine
+    ports:
+      - 8010:8010
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - 9411:9411
+    environment:
+      - STORAGE_TYPE=mem
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.0
+    container_name: elastic
+    configs:
+      - source: elastic-conf
+        target: /usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:6.4.0
+    container_name: logstash
+    configs:
+      - source: logstash-conf
+        target: /usr/share/logstash/config/logstash.yml:ro
+      - source: logstash-pipeline
+        target: /usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - 4560:4560
+      - 9600:9600
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.4.0
+    container_name: kibana
+    ports:
+      - 5601:5601
+    configs:
+      - source: kibana-conf
+        target: /usr/share/kibana/config/kibana.yml:ro
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+configs:
+  elastic-conf:
+    file: ./elk/elastic/elasticsearch.yml
+  kibana-conf:
+    file: ./elk/kibana/kibana.yml
+  logstash-conf:
+    file: ./elk/logstash/logstash.yml
+  logstash-pipeline:
+    file: ./elk/logstash/pipelines.conf
+
+volumes:
+  db-data:
