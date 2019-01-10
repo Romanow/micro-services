@@ -6,3 +6,7 @@ dependencies {
     compile project(":warehouse-api")
     compile project(":warranty-api")
 }
+
+bootJar {
+    archiveName = "store-service.jar"
+}

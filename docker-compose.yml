@@ -1,88 +1,152 @@
-version: '3.3'
+version: '2'
 services:
   eureka-1:
     build: ./eureka
     image: eureka:latest
     container_name: eureka-1
     ports:
-    - 8781:8781
+      - 8781:8781
     environment:
-    - SPRING_PROFILES_ACTIVE=peer1
+      - SPRING_PROFILES_ACTIVE=peer1
     networks:
-    - eureka-network
+      - eureka-network
 
   eureka-2:
     build: ./eureka
     image: eureka:latest
     container_name: eureka-2
     ports:
-    - 8782:8782
+      - 8782:8782
     environment:
-    - SPRING_PROFILES_ACTIVE=peer2
+      - SPRING_PROFILES_ACTIVE=peer2
     networks:
-    - eureka-network
+      - eureka-network
     depends_on:
-    - eureka-1
+      - eureka-1
 
-  #  turbine:
-  #    build: ./turbine
-  #    image: turbine:latest
-  #    container_name: turbine
-  #    ports:
-  #      - 8010:8010
-  #    networks:
-  #      - eureka-network
+  postgres:
+    image: postgres:10.6
+    container_name: postgres
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres/:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+    networks:
+      - eureka-network
+
+  store-service:
+    build: ./store-service
+    image: store-service:last
+    container_name: store-service
+    ports:
+      - 8090:8090
+    networks:
+      - eureka-network
+      - zipkin-network
+      - elk
+
+  order-service:
+    build: ./order-service
+    image: order-service:last
+    container_name: order-service
+    ports:
+      - 8070:8070
+    networks:
+      - eureka-network
+      - zipkin-network
+      - elk
+
+  warehouse-service:
+    build: ./warehouse-service
+    image: warehouse-service:last
+    container_name: warehouse-service
+    ports:
+      - 8060:8060
+    networks:
+      - eureka-network
+      - zipkin-network
+      - elk
+
+  warranty-service:
+    build: ./warranty-service
+    image: warranty-service:last
+    container_name: warranty-service
+    ports:
+      - 8050:8050
+    networks:
+      - eureka-network
+      - zipkin-network
+      - elk
+
+  turbine:
+    build: ./turbine
+    image: turbine:latest
+    container_name: turbine
+    ports:
+      - 8010:8010
+    networks:
+      - eureka-network
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
-    - 9411:9411
+      - 9411:9411
     environment:
-    - STORAGE_TYPE=mem
+      - STORAGE_TYPE=mem
     networks:
-    - zipkin-network
+      - zipkin-network
+      - eureka-network
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.0
     container_name: elastic
     volumes:
-    - ./elk/elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./elk/elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ports:
-    - "9200:9200"
-    - "9300:9300"
+      - 9200:9200
+      - 9300:9300
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
-    - elk
+      - elk
 
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:6.4.0
     container_name: logstash
     volumes:
-    - ./elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-    - ./elk/logstash/pipelines.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./elk/logstash/pipelines.conf:/usr/share/logstash/pipeline/logstash.conf:ro
     ports:
-    - "4560:4560"
-    - "9600:9600"
+      - 4560:4560
+      - 9600:9600
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
-    - elk
+      - elk
     depends_on:
-    - elasticsearch
+      - elasticsearch
 
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:6.4.0
     container_name: kibana
     ports:
-    - "5601:5601"
+      - 5601:5601
     volumes:
-    - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     networks:
-    - elk
+      - elk
 
 networks:
   eureka-network:
   zipkin-network:
   elk:
+
+volumes:
+  db-data:

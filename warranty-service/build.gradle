@@ -4,3 +4,7 @@ dependencies {
     compile project(":order-api")
     compile project(":warranty-api")
 }
+
+bootJar {
+    archiveName = "warranty-service.jar"
+}
