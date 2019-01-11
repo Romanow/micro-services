@@ -14,6 +14,10 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=peer1
     deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
       placement:
         constraints: [node.role == manager]
 
@@ -28,6 +32,10 @@ services:
     depends_on:
       - eureka-1
     deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
       placement:
         constraints: [node.role == manager]
 
@@ -45,6 +53,12 @@ services:
     ports:
       - 5432:5432
     deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
       placement:
         constraints: [node.role == manager]
 
@@ -54,7 +68,14 @@ services:
     container_name: store-service
     ports:
       - 8090:8090
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 #      placement:
 #        constraints: [node.role == worker]
 
@@ -64,7 +85,14 @@ services:
     container_name: order-service
     ports:
       - 8070:8070
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 #      placement:
 #        constraints: [node.role == worker]
 
@@ -74,7 +102,14 @@ services:
     container_name: warehouse-service
     ports:
       - 8060:8060
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 #      placement:
 #        constraints: [node.role == worker]
 
@@ -84,7 +119,14 @@ services:
     container_name: warranty-service
     ports:
       - 8050:8050
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 #      placement:
 #        constraints: [node.role == worker]
 
@@ -95,6 +137,7 @@ services:
     ports:
       - 8010:8010
     deploy:
+      mode: global
       placement:
         constraints: [node.role == manager]
 
@@ -106,6 +149,7 @@ services:
     environment:
       - STORAGE_TYPE=mem
     deploy:
+      mode: global
       placement:
         constraints: [node.role == manager]
 
