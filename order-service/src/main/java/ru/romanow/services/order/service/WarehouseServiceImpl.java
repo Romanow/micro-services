@@ -4,13 +4,15 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.sleuth.SpanName;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import ru.romanow.core.spring.rest.client.SpringRestClient;
+import ru.romanow.services.order.exceptions.EntityProcessException;
 import ru.romanow.services.order.model.enums.SizeChart;
 import ru.romanow.services.warehouse.model.OrderItemRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.annotation.Nonnull;
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,7 +21,7 @@ import java.util.UUID;
 public class WarehouseServiceImpl
         implements WarehouseService {
     private static final String WAREHOUSE_SERVICE = "http://warehouse-service";
-    private final RestTemplate restTemplate;
+    private final SpringRestClient restClient;
 
     @Nonnull
     @Override
@@ -29,13 +31,16 @@ public class WarehouseServiceImpl
                 .setOrderId(orderId)
                 .setModel(model)
                 .setSize(convertToWarehouseSize(size));
-        return Optional.ofNullable(restTemplate.postForObject(WAREHOUSE_SERVICE + "/api/", request, UUID.class));
+        return restClient
+                .post(WAREHOUSE_SERVICE + "/api/", request, UUID.class)
+                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getMessage()))
+                .execute();
     }
 
     @Override
     @HystrixCommand
     public void returnItem(@Nonnull UUID orderId, @Nonnull UUID itemId) {
-        restTemplate.delete(WAREHOUSE_SERVICE + "/api/" + itemId);
+        restClient.delete(WAREHOUSE_SERVICE + "/api/" + itemId, Void.class).execute();
     }
 
     @Nonnull
@@ -43,7 +48,11 @@ public class WarehouseServiceImpl
     @HystrixCommand
     @SpanName("WH check warranty")
     public Optional<OrderWarrantyResponse> checkWarrantyItem(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request) {
-        return Optional.ofNullable(restTemplate.postForObject(WAREHOUSE_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class));
+        return restClient
+                .post(WAREHOUSE_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
+                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getMessage()))
+                .addExceptionMapping(409, (ex) -> new EntityProcessException(ex.getMessage()))
+                .execute();
     }
 
     @Nonnull

@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import ru.romanow.core.spring.rest.client.SpringRestClient;
 import ru.romanow.services.warehouse.exceptions.WarrantyProcessException;
 import ru.romanow.services.warranty.modal.ItemWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.annotation.Nonnull;
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ public class WarrantyServiceImpl
     private static final String WARRANTY_SERVICE = "http://warranty-service";
 
     private final WarehouseService warehouseService;
-    private final RestTemplate restTemplate;
+    private final SpringRestClient restClient;
 
     @Nonnull
     @Override
@@ -44,6 +45,9 @@ public class WarrantyServiceImpl
     @Nonnull
     @HystrixCommand
     private Optional<OrderWarrantyResponse> requestToWarranty(@Nonnull UUID itemId, @Nonnull ItemWarrantyRequest request) {
-        return Optional.ofNullable(restTemplate.postForObject(WARRANTY_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class));
+        return restClient
+                .post(WARRANTY_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
+                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getMessage()))
+                .execute();
     }
 }

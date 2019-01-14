@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.romanow.services.warehouse.exceptions.ItemNotAvailableException;
+import ru.romanow.services.warehouse.exceptions.WarrantyProcessException;
 import ru.romanow.services.warehouse.model.ErrorResponse;
 
 import javax.persistence.EntityNotFoundException;
@@ -34,8 +35,8 @@ public class ExceptionController {
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ItemNotAvailableException.class)
-    public @ResponseBody ErrorResponse conflict(ItemNotAvailableException exception) {
+    @ExceptionHandler({ WarrantyProcessException.class, ItemNotAvailableException.class})
+    public @ResponseBody ErrorResponse conflict(Exception exception) {
         return new ErrorResponse(exception.getMessage());
     }
 

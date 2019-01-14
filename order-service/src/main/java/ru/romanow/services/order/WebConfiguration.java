@@ -8,6 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import ru.romanow.core.spring.rest.client.SpringRestClient;
 
 @Configuration
 public class WebConfiguration {
@@ -16,6 +17,11 @@ public class WebConfiguration {
     @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean
+    public SpringRestClient restClient() {
+        return new SpringRestClient(restTemplate());
     }
 
     @Bean

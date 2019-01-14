@@ -1,4 +1,5 @@
 ext {
+    utilsVersion = "1.0.1-RELEASE"
     gsonVersion = "2.8.5"
     guavaVersion = "20.0"
     validationApiVersion = "2.0.1.Final"

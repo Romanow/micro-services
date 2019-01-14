@@ -4,9 +4,8 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.sleuth.annotation.ContinueSpan;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import ru.romanow.core.spring.rest.client.SpringRestClient;
 import ru.romanow.services.warehouse.model.OrderItemInfoResponse;
 
 import javax.annotation.Nonnull;
@@ -19,13 +18,13 @@ public class WarehouseServiceImpl
         implements WarehouseService {
     private static final Logger logger = LoggerFactory.getLogger(WarehouseService.class);
     private static final String WAREHOUSE_SERVICE = "http://warehouse-service";
-    private final RestTemplate restTemplate;
+    private final SpringRestClient restClient;
 
     @Nonnull
     @Override
     @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
     public Optional<OrderItemInfoResponse> getItemInfo(@Nonnull UUID itemId) {
-        return Optional.ofNullable(restTemplate.getForObject(WAREHOUSE_SERVICE + "/api/" + itemId, OrderItemInfoResponse.class));
+        return restClient.get(WAREHOUSE_SERVICE + "/api/" + itemId, OrderItemInfoResponse.class).execute();
     }
 
     private Optional<OrderItemInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId, Throwable throwable) {

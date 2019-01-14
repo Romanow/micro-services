@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.romanow.services.order.exceptions.CreateOrderException;
+import ru.romanow.services.order.exceptions.EntityProcessException;
 import ru.romanow.services.order.exceptions.WarrantyProcessingException;
 import ru.romanow.services.order.model.ErrorResponse;
 
@@ -35,8 +36,8 @@ public class ExceptionController {
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler({WarrantyProcessingException.class, CreateOrderException.class})
-    public @ResponseBody ErrorResponse conflict(RuntimeException exception) {
+    @ExceptionHandler({ EntityProcessException.class, WarrantyProcessingException.class, CreateOrderException.class})
+    public @ResponseBody ErrorResponse conflict(Exception exception) {
         return new ErrorResponse(exception.getMessage());
     }
 

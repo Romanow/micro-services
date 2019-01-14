@@ -38,8 +38,9 @@ public class WarrantyServiceImpl
     @Override
     @Transactional(readOnly = true)
     public Warranty getWarrantyByItemId(@Nonnull UUID itemId) {
-        return warrantyRepository.findWarrantyByItemId(itemId)
-                                 .orElseThrow(() -> new EntityNotFoundException("Warranty not found for itemId '" + itemId + "'"));
+        return warrantyRepository
+                .findWarrantyByItemId(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Warranty not found for itemId '" + itemId + "'"));
     }
 
     @Nullable
@@ -107,8 +108,8 @@ public class WarrantyServiceImpl
         warranty.setComment(reason);
         final WarrantyStatus status =
                 decision == WarrantyDecision.REFUSE
-                ? WarrantyStatus.REMOVED_FROM_WARRANTY
-                : WarrantyStatus.USE_WARRANTY;
+                        ? WarrantyStatus.REMOVED_FROM_WARRANTY
+                        : WarrantyStatus.USE_WARRANTY;
 
         if (logger.isDebugEnabled()) {
             logger.debug("Set warranty status {} on item '{}'", status, warranty.getItemId());
