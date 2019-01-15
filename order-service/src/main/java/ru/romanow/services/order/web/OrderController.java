@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import ru.romanow.services.order.service.OrderManagementService;
 import ru.romanow.services.order.model.CreateOrderRequest;
 import ru.romanow.services.order.model.OrderInfoResponse;
+import ru.romanow.services.order.model.OrdersInfoResponse;
+import ru.romanow.services.order.service.OrderManagementService;
 import ru.romanow.services.order.service.OrderService;
 import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,7 +28,7 @@ public class OrderController {
     }
 
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private List<OrderInfoResponse> userOrders(@PathVariable UUID userId) {
+    private OrdersInfoResponse userOrders(@PathVariable UUID userId) {
         return orderService.getUserOrders(userId);
     }
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.romanow.services.order.domain.Order;
 import ru.romanow.services.order.model.OrderInfoResponse;
+import ru.romanow.services.order.model.OrdersInfoResponse;
 import ru.romanow.services.order.model.enums.PaymentStatus;
 import ru.romanow.services.order.repository.OrderRepository;
 
@@ -14,13 +15,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityNotFoundException;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import static java.time.LocalDateTime.ofInstant;
 import static java.time.ZoneId.systemDefault;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toCollection;
 
 @Service
 @AllArgsConstructor
@@ -53,13 +53,13 @@ public class OrderServiceImpl
     @Nonnull
     @Override
     @Transactional(readOnly = true)
-    public List<OrderInfoResponse> getUserOrders(@Nonnull UUID userId) {
+    public OrdersInfoResponse getUserOrders(@Nonnull UUID userId) {
         logger.info("Get info for user '{}' orders", userId);
         return orderRepository
                 .findByUserId(userId)
                 .stream()
                 .map(this::buildOrderInfo)
-                .collect(toList());
+                .collect(toCollection(OrdersInfoResponse::new));
     }
 
     @Override

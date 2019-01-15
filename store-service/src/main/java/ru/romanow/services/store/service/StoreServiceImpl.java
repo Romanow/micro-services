@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.services.order.model.OrderInfoResponse;
+import ru.romanow.services.order.model.OrdersInfoResponse;
 import ru.romanow.services.store.exceptions.OrderProcessException;
 import ru.romanow.services.store.exceptions.UserNotFoundException;
 import ru.romanow.services.store.model.*;
@@ -43,7 +44,7 @@ public class StoreServiceImpl
 
         final List<UserOrderResponse> orders = new ArrayList<>();
         logger.debug("Request to OrderService for user '{}' orders", userId);
-        final Optional<List<OrderInfoResponse>> userOrders =
+        final Optional<OrdersInfoResponse> userOrders =
                 orderService.getOrderInfoByUser(userId);
 
         if (userOrders.isPresent()) {

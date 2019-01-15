@@ -2,10 +2,10 @@ package ru.romanow.services.order.service;
 
 import ru.romanow.services.order.domain.Order;
 import ru.romanow.services.order.model.OrderInfoResponse;
+import ru.romanow.services.order.model.OrdersInfoResponse;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
@@ -17,7 +17,7 @@ public interface OrderService {
     OrderInfoResponse getUserOrder(@Nonnull UUID userId, @Nonnull UUID orderId);
 
     @Nonnull
-    List<OrderInfoResponse> getUserOrders(@Nonnull UUID userId);
+    OrdersInfoResponse getUserOrders(@Nonnull UUID userId);
 
     void createOrder(@Nonnull UUID orderId, @Nonnull UUID userId, @Nonnull UUID itemId);
 

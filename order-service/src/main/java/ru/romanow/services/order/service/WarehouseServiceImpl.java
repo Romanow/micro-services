@@ -2,11 +2,11 @@ package ru.romanow.services.order.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
-import org.springframework.cloud.sleuth.SpanName;
 import org.springframework.stereotype.Service;
 import ru.romanow.core.spring.rest.client.SpringRestClient;
 import ru.romanow.services.order.exceptions.EntityProcessException;
 import ru.romanow.services.order.model.enums.SizeChart;
+import ru.romanow.services.warehouse.model.ErrorResponse;
 import ru.romanow.services.warehouse.model.OrderItemRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
@@ -25,7 +25,7 @@ public class WarehouseServiceImpl
 
     @Nonnull
     @Override
-    @HystrixCommand
+    @HystrixCommand(ignoreExceptions = { EntityNotFoundException.class, EntityProcessException.class })
     public Optional<UUID> takeItem(@Nonnull UUID orderId, @Nonnull String model, @Nonnull SizeChart size) {
         final OrderItemRequest request = new OrderItemRequest()
                 .setOrderId(orderId)
@@ -33,7 +33,9 @@ public class WarehouseServiceImpl
                 .setSize(convertToWarehouseSize(size));
         return restClient
                 .post(WAREHOUSE_SERVICE + "/api/", request, UUID.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getMessage()))
+                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                .addExceptionMapping(409, (ex) -> new EntityProcessException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
@@ -45,13 +47,13 @@ public class WarehouseServiceImpl
 
     @Nonnull
     @Override
-    @HystrixCommand
-    @SpanName("WH check warranty")
+    @HystrixCommand(ignoreExceptions = { EntityNotFoundException.class, EntityProcessException.class })
     public Optional<OrderWarrantyResponse> checkWarrantyItem(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request) {
         return restClient
                 .post(WAREHOUSE_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getMessage()))
-                .addExceptionMapping(409, (ex) -> new EntityProcessException(ex.getMessage()))
+                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                .addExceptionMapping(409, (ex) -> new EntityProcessException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 

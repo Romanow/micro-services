@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.core.spring.rest.client.SpringRestClient;
 import ru.romanow.services.warehouse.exceptions.WarrantyProcessException;
+import ru.romanow.services.warranty.modal.ErrorResponse;
 import ru.romanow.services.warranty.modal.ItemWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyRequest;
 import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
@@ -43,11 +44,12 @@ public class WarrantyServiceImpl
     }
 
     @Nonnull
-    @HystrixCommand
+    @HystrixCommand(ignoreExceptions = EntityNotFoundException.class)
     private Optional<OrderWarrantyResponse> requestToWarranty(@Nonnull UUID itemId, @Nonnull ItemWarrantyRequest request) {
         return restClient
                 .post(WARRANTY_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getMessage()))
+                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 }
