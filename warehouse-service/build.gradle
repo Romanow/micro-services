@@ -8,3 +8,7 @@ dependencies {
 bootJar {
     archiveName = "warehouse-service.jar"
 }
+
+springBoot {
+    buildInfo()
+}

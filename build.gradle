@@ -1,17 +1,13 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-        classpath "com.github.ksoichiro:gradle-build-info-plugin:${gitPluginVersion}"
-    }
+plugins {
+    id "org.springframework.boot" version "2.1.4.RELEASE"
+    id "com.gorylenko.gradle-git-properties" version "2.0.0"
 }
 
 configure(subprojects) { project ->
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: "com.gorylenko.gradle-git-properties"
     apply from: '../libraries.gradle'
 
     group 'ru.romanow.services'
@@ -53,6 +49,7 @@ configure(subprojects) { project ->
             compile "org.springframework.boot:spring-boot-starter-web"
             compile "org.springframework.boot:spring-boot-starter-data-jpa"
             compile "org.springframework.boot:spring-boot-starter-actuator"
+            compile "org.springframework.boot:spring-boot-starter-security"
             compile "org.springframework.boot:spring-boot-starter-logging"
 
             compile "org.springframework.cloud:spring-cloud-netflix-eureka-client"
@@ -60,6 +57,8 @@ configure(subprojects) { project ->
             compile "org.springframework.cloud:spring-cloud-starter-netflix-hystrix"
             compile "org.springframework.cloud:spring-cloud-starter-zipkin"
 
+            compile "io.micrometer:micrometer-registry-prometheus"
+            
             compile "com.netflix.eureka:eureka-client"
             compile "com.netflix.ribbon:ribbon-eureka"
 

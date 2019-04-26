@@ -9,3 +9,7 @@ dependencies {
 bootJar {
     archiveName = "order-service.jar"
 }
+
+springBoot {
+    buildInfo()
+}

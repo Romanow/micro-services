@@ -10,3 +10,7 @@ dependencies {
 bootJar {
     archiveName = "store-service.jar"
 }
+
+springBoot {
+    buildInfo()
+}
