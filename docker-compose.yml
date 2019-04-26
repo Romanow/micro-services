@@ -157,7 +157,7 @@ services:
       - 9090:9090
     volumes:
       - ./metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus/data
+      - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus/data'
@@ -172,9 +172,10 @@ services:
     user: "104"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./metrics/grafana/provisioning/:/etc/grafana/provisioning/
-    env_file:
-      - ./grafana/config.monitoring
+      - ./metrics/grafana/:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     networks:
       - metrics
     depends_on:
@@ -182,6 +183,7 @@ services:
 
   node-exporter:
     image: prom/node-exporter:v0.17.0
+    container_name: node-exporter
     ports:
       - '9100:9100'
 

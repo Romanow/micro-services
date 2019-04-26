@@ -4,13 +4,37 @@ global:
     monitor: 'services-monitor'
 
 scrape_configs:
-  - job_name: 'prometheus'
+  - job_name: 'Order Service'
     metrics_path: '/actuator/prometheus'
     basic_auth:
       username: manager
       password: 'test'
     static_configs:
-      - targets: ['order-service:8070', 'store-service:8090', 'warehouse-service:8060', 'warranty-service:8050']
+      - targets: ['order-service:8070']
+
+  - job_name: 'Store Service'
+    metrics_path: '/actuator/prometheus'
+    basic_auth:
+      username: manager
+      password: 'test'
+    static_configs:
+      - targets: ['store-service:8090']
+
+  - job_name: 'Warehouse Service'
+    metrics_path: '/actuator/prometheus'
+    basic_auth:
+      username: manager
+      password: 'test'
+    static_configs:
+      - targets: ['warehouse-service:8060']
+
+  - job_name: 'Warranty Service'
+    metrics_path: '/actuator/prometheus'
+    basic_auth:
+      username: manager
+      password: 'test'
+    static_configs:
+      - targets: ['warranty-service:8050']
 
   - job_name: 'node-exporter'
     static_configs:
