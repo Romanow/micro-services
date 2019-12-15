@@ -8,6 +8,7 @@ import ru.romanow.services.order.model.OrderInfoResponse;
 import ru.romanow.services.order.model.OrdersInfoResponse;
 import ru.romanow.services.store.exceptions.OrderProcessException;
 import ru.romanow.services.store.exceptions.UserNotFoundException;
+import ru.romanow.services.store.exceptions.WarrantyProcessException;
 import ru.romanow.services.store.model.*;
 import ru.romanow.services.store.model.enums.SizeChart;
 import ru.romanow.services.store.model.enums.WarrantyDecision;

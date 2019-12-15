@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.romanow.services.store.exceptions.OrderProcessException;
 import ru.romanow.services.store.exceptions.UserNotFoundException;
 import ru.romanow.services.store.model.ErrorResponse;
-import ru.romanow.services.store.service.WarrantyProcessException;
+import ru.romanow.services.store.exceptions.WarrantyProcessException;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;

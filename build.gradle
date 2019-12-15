@@ -1,6 +1,7 @@
 plugins {
-    id "org.springframework.boot" version "2.1.4.RELEASE"
-    id "com.gorylenko.gradle-git-properties" version "2.0.0"
+    id "org.springframework.boot" version "2.2.0.RELEASE" apply false
+    id "io.spring.dependency-management" version "1.0.8.RELEASE" apply false
+    id "com.gorylenko.gradle-git-properties" version "2.0.0" apply false
 }
 
 configure(subprojects) { project ->
@@ -54,8 +55,8 @@ configure(subprojects) { project ->
             compile "org.springframework.boot:spring-boot-starter-logging"
 
             compile "org.springframework.cloud:spring-cloud-netflix-eureka-client"
-            compile "org.springframework.cloud:spring-cloud-starter-netflix-ribbon"
             compile "org.springframework.cloud:spring-cloud-starter-netflix-hystrix"
+            compile "org.springframework.cloud:spring-cloud-loadbalancer"
             compile "org.springframework.cloud:spring-cloud-starter-zipkin"
 
             compile "io.micrometer:micrometer-registry-prometheus"

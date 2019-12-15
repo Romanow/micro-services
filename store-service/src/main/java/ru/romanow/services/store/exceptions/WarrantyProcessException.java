@@ -1,6 +1,4 @@
-package ru.romanow.services.store.service;
-
-import javax.annotation.Nonnull;
+package ru.romanow.services.store.exceptions;
 
 public class WarrantyProcessException
         extends RuntimeException {
