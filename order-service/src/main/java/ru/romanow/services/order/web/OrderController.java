@@ -32,6 +32,7 @@ public class OrderController {
         return orderService.getUserOrders(userId);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/{userId}",
                  consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
                  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -51,6 +52,6 @@ public class OrderController {
                  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     private OrderWarrantyResponse warranty(@PathVariable UUID orderId,
                                            @RequestBody @Valid OrderWarrantyRequest request) {
-        return orderManagementService.checkWarranty(orderId, request);
+        return orderManagementService.useWarranty(orderId, request);
     }
 }

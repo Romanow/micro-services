@@ -1,8 +1,8 @@
 package ru.romanow.services.order.exceptions;
 
-public class EntityProcessException
+public class WarehouseProcessingException
         extends RuntimeException {
-    public EntityProcessException(String message) {
+    public WarehouseProcessingException(String message) {
         super(message);
     }
 }

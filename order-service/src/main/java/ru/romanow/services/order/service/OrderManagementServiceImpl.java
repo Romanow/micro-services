@@ -68,14 +68,14 @@ public class OrderManagementServiceImpl
 
     @Nonnull
     @Override
-    public OrderWarrantyResponse checkWarranty(@Nonnull UUID orderId, @Nonnull OrderWarrantyRequest request) {
+    public OrderWarrantyResponse useWarranty(@Nonnull UUID orderId, @Nonnull OrderWarrantyRequest request) {
         logger.info("Check warranty (reason: {}) for order '{}'", request.getReason(), orderId);
         final Order order = orderService.getOrderByUid(orderId);
 
         final UUID itemId = order.getItemId();
-        logger.debug("Request to WarrantyService to check warranty for item '{}' in order '{}'", itemId, orderId);
+        logger.debug("Request to WarrantyService to use warranty for item '{}' in order '{}'", itemId, orderId);
         return warehouseService
-                .checkWarrantyItem(itemId, request)
+                .useWarrantyItem(itemId, request)
                 .orElseThrow(() -> new WarrantyProcessingException("Can't process warranty request"));
     }
 }

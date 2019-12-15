@@ -16,5 +16,5 @@ public interface OrderManagementService {
     void refundOrder(@Nonnull UUID orderId);
 
     @Nonnull
-    OrderWarrantyResponse checkWarranty(@Nonnull UUID orderId, @Nonnull OrderWarrantyRequest request);
+    OrderWarrantyResponse useWarranty(@Nonnull UUID orderId, @Nonnull OrderWarrantyRequest request);
 }

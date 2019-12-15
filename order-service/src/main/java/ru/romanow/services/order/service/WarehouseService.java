@@ -16,5 +16,5 @@ public interface WarehouseService {
     void returnItem(@Nonnull UUID orderId, @Nonnull UUID itemId);
 
     @Nonnull
-    Optional<OrderWarrantyResponse> checkWarrantyItem(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request);
+    Optional<OrderWarrantyResponse> useWarrantyItem(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request);
 }

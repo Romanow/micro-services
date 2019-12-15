@@ -2,15 +2,18 @@
 
 ## Endpoints
 
-* /{userId}/orders <br>
-get all user orders info. Read request to Order, WH and Warranty services.
-* /{userId}/{orderId}<br>
-get user order info. Read request to Order, WH and Warranty services.
-* /{userId}/purchase<br>
-Create new order. Write request to Order service.
-* /{userId}/{orderId}/refund<br>
-Refund created order. Write request to Order service.
-* /{userId}/{orderId}/warranty<br>
+* GET /api/v1/\{userId}/orders <br>Get all user orders info. _Read request to Order, WH and Warranty services._
+* GET /api/v1/\{userId}/{orderId}<br>Get user order info. _Read request to Order, WH and Warranty services._
+* /api/v1/\{userId}/purchase<br>Create new order. _Write request to Order service._
+* /api/v1/\{userId}/{orderId}/refund<br>Refund created order. _Write request to Order service._
+* /api/v1/\{userId}/{orderId}/warranty<br>
+
+## Exceptions
+
+* 400 Bad Request - request serialization failed (MethodArgumentNotValidException).
+* 404 Not Found – item with id not found (EntityNotFoundException).
+* 409 Conflict – request to Warranty service failed (WarrantyProcessException) or request to Order service failed (OrderProcessException).  
+* 500 Internal Server Error – everything fails (Exception).
 
 ## Configuration
 
@@ -20,3 +23,17 @@ Refund created order. Write request to Order service.
 * Secure /manage endpoint with `manager / test` credentials.
 * Send every trace statistics to Zipkin (`spring.sleuth.sampler.probability=1.0`).
 * Swagger api doc `/api-doc`. 
+
+## Database
+### Structure
+
+```sql
+```
+
+### Initial data
+DB initialized with following items:
+```
+#1:
+name: Ronin
+uid: 221f3d2e-da16-410f-8d24-3974e38e54ad
+```
