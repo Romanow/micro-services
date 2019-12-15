@@ -49,6 +49,7 @@ public class WarrantyServiceImpl
         return restClient
                 .post(WARRANTY_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 }

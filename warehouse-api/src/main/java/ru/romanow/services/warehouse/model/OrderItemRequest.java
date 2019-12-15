@@ -2,7 +2,6 @@ package ru.romanow.services.warehouse.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.romanow.services.warehouse.model.enums.SizeChart;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -19,5 +18,5 @@ public class OrderItemRequest {
     private String model;
 
     @NotNull(message = "{field.is.null")
-    private SizeChart size;
+    private String size;
 }

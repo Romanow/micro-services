@@ -72,7 +72,7 @@ public class WarrantyServiceImpl
         updateWarranty(warranty, decision, request.getReason());
 
         return new OrderWarrantyResponse()
-                .setDecision(decision)
+                .setDecision(decision.name())
                 .setWarrantyDate(formatDate(warranty.getWarrantyDate()));
     }
 
@@ -132,7 +132,7 @@ public class WarrantyServiceImpl
     private WarrantyInfoResponse buildWarrantyInfo(@Nonnull Warranty warranty) {
         return new WarrantyInfoResponse()
                 .setItemId(warranty.getItemId())
-                .setStatus(warranty.getStatus())
+                .setStatus(warranty.getStatus().name())
                 .setWarrantyDate(formatDate(warranty.getWarrantyDate()));
     }
 

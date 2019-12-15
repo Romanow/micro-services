@@ -11,12 +11,12 @@
 ## Infrastructure
 
 Using:
-* Eureka for service discovery
-* Grafana and Prometheus for collecting metrics
-* PostgreSQL
-* ELK for logging
-* Turbine for monitoring Hystrix
-* Zipkin for distributed tracing
+* Eureka for service discovery.
+* Grafana and Prometheus for collecting metrics.
+* PostgreSQL.
+* ELK for logging.
+* Turbine for monitoring Hystrix.
+* Spring Sleuth for distributed tracing (using Zipkin protocol and Jaeger to collect data).
 
 ### Portainer for monitoring docker images
 ```bash
@@ -38,7 +38,7 @@ wrk -t12 -c150 -d60s --latency http://localhost:8090/api/v1/221f3d2e-da16-410f-8
 Add ips to `/etc/hosts`:
 ```
 127.0.0.1	postgres
-127.0.0.1	zipkin
+127.0.0.1	tracing
 127.0.0.1	eureka-1
 127.0.0.1	eureka-2
 127.0.0.1	logstash

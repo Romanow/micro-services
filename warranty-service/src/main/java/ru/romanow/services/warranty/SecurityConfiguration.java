@@ -15,6 +15,7 @@ public class SecurityConfiguration
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+            .mvcMatchers("/manage/hystrix.stream").permitAll()
             .antMatchers("/manage/**").hasRole(ROLE)
             .antMatchers("/**").permitAll()
             .and()

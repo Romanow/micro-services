@@ -13,6 +13,7 @@ import java.util.UUID;
 public class WarrantyServiceImpl
         implements WarrantyService {
     private static final String WARRANTY_SERVICE = "http://warranty-service";
+
     private final SpringRestClient restClient;
 
     @Override

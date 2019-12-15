@@ -2,7 +2,6 @@ package ru.romanow.services.store.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.romanow.services.store.model.enums.WarrantyDecision;
 
 import java.util.UUID;
 
@@ -11,5 +10,5 @@ import java.util.UUID;
 public class WarrantyResponse {
     private UUID orderId;
     private String warrantyDate;
-    private WarrantyDecision decision;
+    private String decision;
 }

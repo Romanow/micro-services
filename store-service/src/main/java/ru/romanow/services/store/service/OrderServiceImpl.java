@@ -25,8 +25,8 @@ import java.util.UUID;
 public class OrderServiceImpl
         implements OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
-
     private static final String ORDER_SERVICE = "http://order-service";
+
     private final SpringRestClient restClient;
 
     @Nonnull
@@ -55,6 +55,7 @@ public class OrderServiceImpl
                 .post(ORDER_SERVICE + "/api/v1/" + userId, request, UUID.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
                 .addExceptionMapping(409, (ex) -> new OrderProcessException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
@@ -64,6 +65,7 @@ public class OrderServiceImpl
         restClient
                 .delete(ORDER_SERVICE + "/api/v1/" + orderId, Void.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
@@ -76,6 +78,7 @@ public class OrderServiceImpl
                 .post(ORDER_SERVICE + "/api/v1/" + orderId + "/warranty", warrantyRequest, OrderWarrantyResponse.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
                 .addExceptionMapping(409, (ex) -> new OrderProcessException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 

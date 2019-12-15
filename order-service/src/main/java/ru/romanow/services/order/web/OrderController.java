@@ -22,34 +22,34 @@ public class OrderController {
     private final OrderService orderService;
     private final OrderManagementService orderManagementService;
 
-    @GetMapping(value = "/{userId}/{orderId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/{userId}/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
     private OrderInfoResponse userOrder(@PathVariable UUID userId, @PathVariable UUID orderId) {
         return orderService.getUserOrder(userId, orderId);
     }
 
-    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     private OrdersInfoResponse userOrders(@PathVariable UUID userId) {
         return orderService.getUserOrders(userId);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/{userId}",
-                 consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-                 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     private UUID makeOrder(@PathVariable UUID userId,
                            @RequestBody @Valid CreateOrderRequest request) {
         return orderManagementService.makeOrder(userId, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(value = "/{orderId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @DeleteMapping(value = "/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
     private void refundOrder(@PathVariable UUID orderId) {
         orderManagementService.refundOrder(orderId);
     }
 
     @PostMapping(value = "/{orderId}/warranty",
-                 consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-                 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     private OrderWarrantyResponse warranty(@PathVariable UUID orderId,
                                            @RequestBody @Valid OrderWarrantyRequest request) {
         return orderManagementService.useWarranty(orderId, request);

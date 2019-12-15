@@ -20,7 +20,7 @@ import static java.lang.String.format;
 public class StoreController {
     private StoreService storeService;
 
-    @GetMapping(value = "/{userId}/orders", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/{userId}/orders", produces = MediaType.APPLICATION_JSON_VALUE)
     private UserOrdersResponse orders(@PathVariable UUID userId) {
         return storeService.findUserOrders(userId);
     }
@@ -31,8 +31,8 @@ public class StoreController {
     }
 
     @PostMapping(value = "/{userId}/purchase",
-                 consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-                 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     private void purchase(@PathVariable UUID userId,
                           @RequestBody @Valid PurchaseRequest request,
                           HttpServletResponse servletResponse) {
@@ -42,16 +42,16 @@ public class StoreController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/{userId}/{orderId}/refund",
-                   consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-                   produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     private void refund(@PathVariable UUID userId,
                           @PathVariable UUID orderId) {
         storeService.refundPurchase(userId, orderId);
     }
 
     @PostMapping(value = "/{userId}/{orderId}/warranty",
-                 consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-                 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     private WarrantyResponse warranty(@PathVariable UUID userId,
                                       @PathVariable UUID orderId,
                                       @RequestBody @Valid WarrantyRequest request) {

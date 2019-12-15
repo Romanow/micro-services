@@ -10,9 +10,6 @@ import ru.romanow.services.store.exceptions.OrderProcessException;
 import ru.romanow.services.store.exceptions.UserNotFoundException;
 import ru.romanow.services.store.exceptions.WarrantyProcessException;
 import ru.romanow.services.store.model.*;
-import ru.romanow.services.store.model.enums.SizeChart;
-import ru.romanow.services.store.model.enums.WarrantyDecision;
-import ru.romanow.services.store.model.enums.WarrantyStatus;
 import ru.romanow.services.warranty.modal.OrderWarrantyResponse;
 
 import javax.annotation.Nonnull;
@@ -64,13 +61,13 @@ public class StoreServiceImpl
                 warehouseService.getItemInfo(itemId)
                                 .ifPresent(info -> order
                                         .setModel(info.getModel())
-                                        .setSize(convertToStoreSize(info.getSize())));
+                                        .setSize(info.getSize()));
 
                 logger.debug("Request to Warranty for item '{}' info by order '{}'", itemId, orderInfo.getOrderId());
                 warrantyService.getItemWarrantyInfo(itemId)
                                .ifPresent(warrantyInfo -> order
                                        .setWarrantyDate(warrantyInfo.getWarrantyDate())
-                                       .setWarrantyStatus(convertToStoreWarrantyStatus(warrantyInfo.getStatus())));
+                                       .setWarrantyStatus(warrantyInfo.getStatus()));
 
                 orders.add(order);
             }
@@ -104,13 +101,13 @@ public class StoreServiceImpl
             warehouseService.getItemInfo(itemId)
                             .ifPresent(info -> orderResponse
                                     .setModel(info.getModel())
-                                    .setSize(convertToStoreSize(info.getSize())));
+                                    .setSize(info.getSize()));
 
             logger.debug("Request to WarrantyService for item '{}' info by order '{}'", itemId, orderId);
             warrantyService.getItemWarrantyInfo(itemId)
                            .ifPresent(warrantyInfo -> orderResponse
                                    .setWarrantyDate(warrantyInfo.getWarrantyDate())
-                                   .setWarrantyStatus(convertToStoreWarrantyStatus(warrantyInfo.getStatus())));
+                                   .setWarrantyStatus(warrantyInfo.getStatus()));
         } else {
             logger.warn("User '{}' has no order '{}'", userId, orderId);
         }
@@ -162,22 +159,7 @@ public class StoreServiceImpl
     private WarrantyResponse buildWarrantyResponse(@Nonnull UUID orderId, @Nonnull OrderWarrantyResponse response) {
         return new WarrantyResponse()
                 .setOrderId(orderId)
-                .setDecision(convertToStoreWarrantyDecision(response.getDecision()))
+                .setDecision(response.getDecision())
                 .setWarrantyDate(response.getWarrantyDate());
-    }
-
-    @Nonnull
-    private WarrantyDecision convertToStoreWarrantyDecision(@Nonnull ru.romanow.services.warranty.modal.enums.WarrantyDecision decision) {
-        return WarrantyDecision.valueOf(decision.name());
-    }
-
-    @Nonnull
-    private WarrantyStatus convertToStoreWarrantyStatus(@Nonnull ru.romanow.services.warranty.modal.enums.WarrantyStatus status) {
-        return WarrantyStatus.valueOf(status.name());
-    }
-
-    @Nonnull
-    private SizeChart convertToStoreSize(@Nonnull ru.romanow.services.warehouse.model.enums.SizeChart size) {
-        return SizeChart.valueOf(size.name());
     }
 }

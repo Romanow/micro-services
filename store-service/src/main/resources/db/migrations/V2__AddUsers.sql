@@ -1,0 +1,2 @@
+INSERT INTO store.users (name, uid)
+VALUES ('Ronin', '221f3d2e-da16-410f-8d24-3974e38e54ad');

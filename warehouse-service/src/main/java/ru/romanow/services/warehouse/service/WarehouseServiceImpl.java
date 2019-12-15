@@ -56,7 +56,7 @@ public class WarehouseServiceImpl
     @Transactional
     public UUID takeItem(@Nonnull OrderItemRequest request) {
         final String model = request.getModel();
-        final SizeChart size = request.getSize();
+        final SizeChart size = SizeChart.valueOf(request.getSize());
         final UUID orderId = request.getOrderId();
 
         logger.info("Take item (model: {}, sie: {}) for order '{}'", model, size, orderId);
@@ -114,6 +114,6 @@ public class WarehouseServiceImpl
         return new OrderItemInfoResponse()
                 .setItemId(uid)
                 .setModel(item.getModel())
-                .setSize(item.getSize());
+                .setSize(item.getSize().name());
     }
 }

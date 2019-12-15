@@ -21,12 +21,12 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
     private final WarrantyService warrantyService;
 
-    @GetMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
     private OrderItemInfoResponse item(@PathVariable UUID itemId) {
         return warehouseService.getItemInfo(itemId);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UUID takeItem(@Valid @RequestBody OrderItemRequest request) {
         return warehouseService.takeItem(request);
     }

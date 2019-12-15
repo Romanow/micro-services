@@ -1,9 +1,9 @@
 package ru.romanow.services.store.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.core.spring.rest.client.SpringRestClient;
 import ru.romanow.services.warehouse.model.OrderItemInfoResponse;
@@ -19,16 +19,13 @@ public class WarehouseServiceImpl
     private static final Logger logger = LoggerFactory.getLogger(WarehouseService.class);
     private static final String WAREHOUSE_SERVICE = "http://warehouse-service";
 
-    private final CircuitBreakerFactory factory;
     private final SpringRestClient restClient;
 
     @Nonnull
     @Override
+    @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
     public Optional<OrderItemInfoResponse> getItemInfo(@Nonnull UUID itemId) {
-        return factory
-                .create("getItemInfo")
-                .run(() -> restClient.get(WAREHOUSE_SERVICE + "/api/v1/" + itemId, OrderItemInfoResponse.class).execute(),
-                     throwable -> getOrderInfoFallback(itemId, throwable));
+        return restClient.get(WAREHOUSE_SERVICE + "/api/v1/" + itemId, OrderItemInfoResponse.class).execute();
     }
 
     private Optional<OrderItemInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId, Throwable throwable) {

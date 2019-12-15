@@ -19,7 +19,7 @@ import java.util.UUID;
 public class WarrantyController {
     private final WarrantyService warrantyService;
 
-    @GetMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
     private WarrantyInfoResponse warrantyInfo(@PathVariable UUID itemId) {
         return warrantyService.getWarrantyInfo(itemId);
     }
@@ -37,8 +37,8 @@ public class WarrantyController {
     }
 
     @PostMapping(value = "/{itemId}/warranty",
-                 consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-                 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public OrderWarrantyResponse warrantyRequest(@PathVariable UUID itemId, @RequestBody @Valid ItemWarrantyRequest request) {
         return warrantyService.warrantyRequest(itemId, request);
     }

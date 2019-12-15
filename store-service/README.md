@@ -21,13 +21,19 @@
 * Send logs to ELK (custom [logback-spring.xml](/src/main/resources/logback-spring.xml))
 * Expose metrics for Prometheus.
 * Secure /manage endpoint with `manager / test` credentials.
-* Send every trace statistics to Zipkin (`spring.sleuth.sampler.probability=1.0`).
+* Send every trace statistics to Jaeger (using Zipkin protocol) (`spring.sleuth.sampler.probability=1.0`).
 * Swagger api doc `/api-doc`. 
 
 ## Database
 ### Structure
 
 ```sql
+CREATE TABLE users
+(
+  id SERIAL CONSTRAINT users_pkey PRIMARY KEY,
+  name VARCHAR(255) NOT NULL CONSTRAINT idx_users_name UNIQUE,
+  uid UUID NOT NULL CONSTRAINT idx_users_uid UNIQUE
+);
 ```
 
 ### Initial data

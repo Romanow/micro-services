@@ -21,6 +21,7 @@ import java.util.UUID;
 public class WarehouseServiceImpl
         implements WarehouseService {
     private static final String WAREHOUSE_SERVICE = "http://warehouse-service";
+
     private final SpringRestClient restClient;
 
     @Nonnull
@@ -30,11 +31,13 @@ public class WarehouseServiceImpl
         final OrderItemRequest request = new OrderItemRequest()
                 .setOrderId(orderId)
                 .setModel(model)
-                .setSize(convertToWarehouseSize(size));
+                .setSize(size.name());
+
         return restClient
                 .post(WAREHOUSE_SERVICE + "/api/v1/", request, UUID.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
                 .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
@@ -52,11 +55,8 @@ public class WarehouseServiceImpl
                 .post(WAREHOUSE_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
                 .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
+                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
-    @Nonnull
-    private ru.romanow.services.warehouse.model.enums.SizeChart convertToWarehouseSize(@Nonnull SizeChart size) {
-        return ru.romanow.services.warehouse.model.enums.SizeChart.valueOf(size.name());
-    }
 }

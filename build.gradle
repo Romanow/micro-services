@@ -45,8 +45,8 @@ configure(subprojects) { project ->
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         
         if (project.name.endsWith('-service')) {
-            compile 'ru.romanow.core:commons:1.0.1.RELEASE'
-            compile "ru.romanow.core:spring-rest-client:1.0.1.RELEASE"
+            compile "ru.romanow.core:commons:${utilsVersion}"
+            compile "ru.romanow.core:spring-rest-client:${utilsVersion}"
             
             compile "org.springframework.boot:spring-boot-starter-web"
             compile "org.springframework.boot:spring-boot-starter-data-jpa"
