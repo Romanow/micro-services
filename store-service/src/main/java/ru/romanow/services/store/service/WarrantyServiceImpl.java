@@ -24,11 +24,11 @@ public class WarrantyServiceImpl
     @Override
     @HystrixCommand(fallbackMethod = "getItemWarrantyInfoFallback")
     public Optional<WarrantyInfoResponse> getItemWarrantyInfo(@Nonnull UUID itemId) {
-        return restClient.get(WARRANTY_SERVICE + "/api/" + itemId, WarrantyInfoResponse.class).execute();
+        return restClient.get(WARRANTY_SERVICE + "/api/v1/" + itemId, WarrantyInfoResponse.class).execute();
     }
 
     public Optional<WarrantyInfoResponse> getItemWarrantyInfoFallback(@Nonnull UUID itemId, Throwable throwable) {
-        logger.warn("Request to '{}/api/{}' failed with exception: {}. Use fallback", WARRANTY_SERVICE, itemId, throwable.getMessage());
+        logger.warn("Request to '{}/api/v1/{}' failed with exception: {}. Use fallback", WARRANTY_SERVICE, itemId, throwable.getMessage());
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }

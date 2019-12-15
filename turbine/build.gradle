@@ -12,5 +12,5 @@ springBoot {
 }
 
 bootJar {
-    archiveName = "turbine.jar"
+    archiveFileName = "turbine.jar"
 }

@@ -6,7 +6,7 @@ dependencies {
 }
 
 bootJar {
-    archiveName = "warehouse-service.jar"
+    archiveFileName = "warehouse-service.jar"
 }
 
 springBoot {

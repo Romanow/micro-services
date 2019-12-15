@@ -2,8 +2,6 @@ package ru.romanow.services.store.web;
 
 import com.google.common.net.HttpHeaders;
 import lombok.AllArgsConstructor;
-import org.springframework.cloud.sleuth.SpanName;
-import org.springframework.cloud.sleuth.annotation.NewSpan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +15,7 @@ import java.util.UUID;
 import static java.lang.String.format;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @AllArgsConstructor
 public class StoreController {
     private StoreService storeService;
@@ -46,7 +44,7 @@ public class StoreController {
     @DeleteMapping(value = "/{userId}/{orderId}/refund",
                    consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
                    produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    private void purchase(@PathVariable UUID userId,
+    private void refund(@PathVariable UUID userId,
                           @PathVariable UUID orderId) {
         storeService.refundPurchase(userId, orderId);
     }

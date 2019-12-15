@@ -18,12 +18,12 @@ public class WarrantyServiceImpl
     @Override
     @HystrixCommand
     public void startWarranty(@Nonnull UUID itemId) {
-        restClient.post(WARRANTY_SERVICE + "/api/" + itemId, null, Void.class).execute();
+        restClient.post(WARRANTY_SERVICE + "/api/v1/" + itemId, null, Void.class).execute();
     }
 
     @Override
     @HystrixCommand
     public void stopWarranty(@Nonnull UUID itemId) {
-        restClient.delete(WARRANTY_SERVICE + "/api/" + itemId, Void.class).execute();
+        restClient.delete(WARRANTY_SERVICE + "/api/v1/" + itemId, Void.class).execute();
     }
 }

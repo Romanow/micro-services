@@ -6,7 +6,7 @@ dependencies {
 }
 
 bootJar {
-    archiveName = "warranty-service.jar"
+    archiveFileName = "warranty-service.jar"
 }
 
 springBoot {

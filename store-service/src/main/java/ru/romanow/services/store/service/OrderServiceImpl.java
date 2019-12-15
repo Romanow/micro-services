@@ -34,7 +34,7 @@ public class OrderServiceImpl
     @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
     public Optional<OrderInfoResponse> getOrderInfo(@Nonnull UUID userId, @Nonnull UUID orderId) {
         return restClient
-                .get(ORDER_SERVICE + "/api/" + userId + "/" + orderId, OrderInfoResponse.class)
+                .get(ORDER_SERVICE + "/api/v1/" + userId + "/" + orderId, OrderInfoResponse.class)
                 .execute();
     }
 
@@ -43,7 +43,7 @@ public class OrderServiceImpl
     @HystrixCommand(fallbackMethod = "getOrderInfoByUserFallback")
     public Optional<OrdersInfoResponse> getOrderInfoByUser(@Nonnull UUID userId) {
         return restClient
-                .get(ORDER_SERVICE + "/api/" + userId, OrdersInfoResponse.class)
+                .get(ORDER_SERVICE + "/api/v1/" + userId, OrdersInfoResponse.class)
                 .execute();
     }
 
@@ -52,10 +52,9 @@ public class OrderServiceImpl
     @HystrixCommand(ignoreExceptions = { EntityNotFoundException.class, OrderProcessException.class })
     public Optional<UUID> makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request) {
         return restClient
-                .post(ORDER_SERVICE + "/api/" + userId, request, UUID.class)
+                .post(ORDER_SERVICE + "/api/v1/" + userId, request, UUID.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
                 .addExceptionMapping(409, (ex) -> new OrderProcessException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
@@ -63,9 +62,8 @@ public class OrderServiceImpl
     @HystrixCommand(ignoreExceptions = EntityNotFoundException.class)
     public void refundPurchase(@Nonnull UUID orderId) {
         restClient
-                .delete(ORDER_SERVICE + "/api/" + orderId, Void.class)
+                .delete(ORDER_SERVICE + "/api/v1/" + orderId, Void.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
@@ -75,16 +73,15 @@ public class OrderServiceImpl
     public Optional<OrderWarrantyResponse> warrantyRequest(@Nonnull UUID orderId, @Nonnull WarrantyRequest request) {
         final OrderWarrantyRequest warrantyRequest = new OrderWarrantyRequest().setReason(request.getReason());
         return restClient
-                .post(ORDER_SERVICE + "/api/" + orderId + "/warranty", warrantyRequest, OrderWarrantyResponse.class)
+                .post(ORDER_SERVICE + "/api/v1/" + orderId + "/warranty", warrantyRequest, OrderWarrantyResponse.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
                 .addExceptionMapping(409, (ex) -> new OrderProcessException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
     @Nonnull
     private Optional<OrderInfoResponse> getOrderInfoFallback(@Nonnull UUID userId, @Nonnull UUID orderId, Throwable throwable) {
-        logger.warn("Request to GET '{}/api/{}/{}' failed with exception: {}. Use fallback", ORDER_SERVICE, userId, orderId, throwable.getMessage());
+        logger.warn("Request to GET '{}/api/v1/{}/{}' failed with exception: {}. Use fallback", ORDER_SERVICE, userId, orderId, throwable.getMessage());
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }
@@ -93,7 +90,7 @@ public class OrderServiceImpl
 
     @Nonnull
     private Optional<OrdersInfoResponse> getOrderInfoByUserFallback(@Nonnull UUID userId, Throwable throwable) {
-        logger.warn("Request to GET '{}/api/{}' failed with exception: {}. Use fallback", ORDER_SERVICE, userId, throwable.getMessage());
+        logger.warn("Request to GET '{}/api/v1/{}' failed with exception: {}. Use fallback", ORDER_SERVICE, userId, throwable.getMessage());
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }

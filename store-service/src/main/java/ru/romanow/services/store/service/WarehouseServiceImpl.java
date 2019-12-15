@@ -24,11 +24,11 @@ public class WarehouseServiceImpl
     @Override
     @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
     public Optional<OrderItemInfoResponse> getItemInfo(@Nonnull UUID itemId) {
-        return restClient.get(WAREHOUSE_SERVICE + "/api/" + itemId, OrderItemInfoResponse.class).execute();
+        return restClient.get(WAREHOUSE_SERVICE + "/api/v1/" + itemId, OrderItemInfoResponse.class).execute();
     }
 
     private Optional<OrderItemInfoResponse> getOrderInfoFallback(@Nonnull UUID itemId, Throwable throwable) {
-        logger.warn("Request to '{}/api/{}' failed with exception: {}. Use fallback", WAREHOUSE_SERVICE, itemId, throwable.getMessage());
+        logger.warn("Request to '{}/api/v1/{}' failed with exception: {}. Use fallback", WAREHOUSE_SERVICE, itemId, throwable.getMessage());
         if (logger.isDebugEnabled()) {
             logger.debug("", throwable);
         }

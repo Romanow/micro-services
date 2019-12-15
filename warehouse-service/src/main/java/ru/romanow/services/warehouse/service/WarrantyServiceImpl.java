@@ -47,9 +47,8 @@ public class WarrantyServiceImpl
     @HystrixCommand(ignoreExceptions = EntityNotFoundException.class)
     private Optional<OrderWarrantyResponse> requestToWarranty(@Nonnull UUID itemId, @Nonnull ItemWarrantyRequest request) {
         return restClient
-                .post(WARRANTY_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
+                .post(WARRANTY_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 }

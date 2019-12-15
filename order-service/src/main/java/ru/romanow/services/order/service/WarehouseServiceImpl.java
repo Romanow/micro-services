@@ -32,17 +32,16 @@ public class WarehouseServiceImpl
                 .setModel(model)
                 .setSize(convertToWarehouseSize(size));
         return restClient
-                .post(WAREHOUSE_SERVICE + "/api/", request, UUID.class)
+                .post(WAREHOUSE_SERVICE + "/api/v1/", request, UUID.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
                 .addExceptionMapping(409, (ex) -> new EntityProcessException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 
     @Override
     @HystrixCommand
     public void returnItem(@Nonnull UUID orderId, @Nonnull UUID itemId) {
-        restClient.delete(WAREHOUSE_SERVICE + "/api/" + itemId, Void.class).execute();
+        restClient.delete(WAREHOUSE_SERVICE + "/api/v1/" + itemId, Void.class).execute();
     }
 
     @Nonnull
@@ -50,10 +49,9 @@ public class WarehouseServiceImpl
     @HystrixCommand(ignoreExceptions = { EntityNotFoundException.class, EntityProcessException.class })
     public Optional<OrderWarrantyResponse> checkWarrantyItem(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request) {
         return restClient
-                .post(WAREHOUSE_SERVICE + "/api/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
+                .post(WAREHOUSE_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
                 .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
                 .addExceptionMapping(409, (ex) -> new EntityProcessException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
                 .execute();
     }
 

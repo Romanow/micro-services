@@ -10,5 +10,5 @@ springBoot {
 }
 
 bootJar {
-    archiveName = "eureka.jar"
+    archiveFileName = "eureka.jar"
 }

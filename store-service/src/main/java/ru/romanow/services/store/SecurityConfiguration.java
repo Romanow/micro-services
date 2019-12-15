@@ -15,7 +15,7 @@ public class SecurityConfiguration
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-            .antMatchers("/actuator/**").hasRole(ROLE)
+            .antMatchers("/manage/**").hasRole(ROLE)
             .antMatchers("/**").permitAll()
             .and()
             .httpBasic()
