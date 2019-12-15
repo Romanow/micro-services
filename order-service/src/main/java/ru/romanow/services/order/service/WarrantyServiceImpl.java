@@ -1,7 +1,7 @@
 package ru.romanow.services.order.service;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.core.spring.rest.client.SpringRestClient;
 
@@ -14,17 +14,16 @@ public class WarrantyServiceImpl
         implements WarrantyService {
     private static final String WARRANTY_SERVICE = "http://warranty-service";
 
+    private final CircuitBreakerFactory factory;
     private final SpringRestClient restClient;
 
     @Override
-    @HystrixCommand
     public void startWarranty(@Nonnull UUID itemId) {
-        restClient.post(WARRANTY_SERVICE + "/api/v1/" + itemId, null, Void.class).execute();
+        factory.create("startWarranty").run(() -> restClient.post(WARRANTY_SERVICE + "/api/v1/" + itemId, null, Void.class).execute());
     }
 
     @Override
-    @HystrixCommand
     public void stopWarranty(@Nonnull UUID itemId) {
-        restClient.delete(WARRANTY_SERVICE + "/api/v1/" + itemId, Void.class).execute();
+        factory.create("stopWarranty").run(() -> restClient.delete(WARRANTY_SERVICE + "/api/v1/" + itemId, Void.class).execute());
     }
 }

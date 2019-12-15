@@ -1,9 +1,9 @@
 package ru.romanow.services.store.service;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.core.spring.rest.client.SpringRestClient;
 import ru.romanow.services.order.model.ErrorResponse;
@@ -27,59 +27,73 @@ public class OrderServiceImpl
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
     private static final String ORDER_SERVICE = "http://order-service";
 
+    private final CircuitBreakerFactory factory;
     private final SpringRestClient restClient;
 
     @Nonnull
     @Override
-    @HystrixCommand(fallbackMethod = "getOrderInfoFallback")
     public Optional<OrderInfoResponse> getOrderInfo(@Nonnull UUID userId, @Nonnull UUID orderId) {
-        return restClient
-                .get(ORDER_SERVICE + "/api/v1/" + userId + "/" + orderId, OrderInfoResponse.class)
-                .execute();
+        return factory
+                .create("getOrderInfo")
+                .run(() -> restClient
+                             .get(ORDER_SERVICE + "/api/v1/" + userId + "/" + orderId, OrderInfoResponse.class)
+                             .execute(),
+                     throwable -> getOrderInfoFallback(userId, orderId, throwable));
     }
 
     @Nonnull
     @Override
-    @HystrixCommand(fallbackMethod = "getOrderInfoByUserFallback")
     public Optional<OrdersInfoResponse> getOrderInfoByUser(@Nonnull UUID userId) {
-        return restClient
-                .get(ORDER_SERVICE + "/api/v1/" + userId, OrdersInfoResponse.class)
-                .execute();
+        return factory
+                .create("getOrderInfoByUser")
+                .run(() -> restClient
+                             .get(ORDER_SERVICE + "/api/v1/" + userId, OrdersInfoResponse.class)
+                             .execute(),
+                     throwable -> getOrderInfoByUserFallback(userId, throwable));
     }
 
     @Nonnull
     @Override
-    @HystrixCommand(ignoreExceptions = { EntityNotFoundException.class, OrderProcessException.class })
     public Optional<UUID> makePurchase(@Nonnull UUID userId, @Nonnull PurchaseRequest request) {
-        return restClient
-                .post(ORDER_SERVICE + "/api/v1/" + userId, request, UUID.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                .addExceptionMapping(409, (ex) -> new OrderProcessException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
-                .execute();
+        return factory
+                .create("makePurchase")
+                .run(() -> restClient
+                             .post(ORDER_SERVICE + "/api/v1/" + userId, request, UUID.class)
+                             .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                             .addExceptionMapping(409, (ex) -> new OrderProcessException(ex.getBody(ErrorResponse.class).getMessage()))
+                             .commonErrorResponseClass(ErrorResponse.class)
+                             .execute(),
+                     throwable -> defaultFallback(throwable));
+    }
+
+    private Optional<UUID> defaultFallback(Throwable throwable) {
+        if (throwable instanceof EntityNotFoundException || throwable instanceof OrderProcessException)
+            throw (RuntimeException)throwable;
+        return Optional.empty();
     }
 
     @Override
-    @HystrixCommand(ignoreExceptions = EntityNotFoundException.class)
     public void refundPurchase(@Nonnull UUID orderId) {
-        restClient
-                .delete(ORDER_SERVICE + "/api/v1/" + orderId, Void.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
-                .execute();
+        factory.create("refundPurchase")
+               .run(() -> restClient
+                       .delete(ORDER_SERVICE + "/api/v1/" + orderId, Void.class)
+                       .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                       .commonErrorResponseClass(ErrorResponse.class)
+                       .execute());
     }
 
     @Nonnull
     @Override
-    @HystrixCommand(ignoreExceptions = { EntityNotFoundException.class, OrderProcessException.class })
     public Optional<OrderWarrantyResponse> warrantyRequest(@Nonnull UUID orderId, @Nonnull WarrantyRequest request) {
         final OrderWarrantyRequest warrantyRequest = new OrderWarrantyRequest().setReason(request.getReason());
-        return restClient
-                .post(ORDER_SERVICE + "/api/v1/" + orderId + "/warranty", warrantyRequest, OrderWarrantyResponse.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                .addExceptionMapping(409, (ex) -> new OrderProcessException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
-                .execute();
+        return factory
+                .create("warrantyRequest")
+                .run(() -> restClient
+                        .post(ORDER_SERVICE + "/api/v1/" + orderId + "/warranty", warrantyRequest, OrderWarrantyResponse.class)
+                        .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                        .addExceptionMapping(409, (ex) -> new OrderProcessException(ex.getBody(ErrorResponse.class).getMessage()))
+                        .commonErrorResponseClass(ErrorResponse.class)
+                        .execute());
     }
 
     @Nonnull

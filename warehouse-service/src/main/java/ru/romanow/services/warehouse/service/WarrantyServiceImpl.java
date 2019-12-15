@@ -1,9 +1,9 @@
 package ru.romanow.services.warehouse.service;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.core.spring.rest.client.SpringRestClient;
 import ru.romanow.services.warehouse.exceptions.WarrantyProcessException;
@@ -25,6 +25,7 @@ public class WarrantyServiceImpl
 
     private static final String WARRANTY_SERVICE = "http://warranty-service";
 
+    private final CircuitBreakerFactory factory;
     private final WarehouseService warehouseService;
     private final SpringRestClient restClient;
 
@@ -44,12 +45,13 @@ public class WarrantyServiceImpl
     }
 
     @Nonnull
-    @HystrixCommand(ignoreExceptions = EntityNotFoundException.class)
     private Optional<OrderWarrantyResponse> requestToWarranty(@Nonnull UUID itemId, @Nonnull ItemWarrantyRequest request) {
-        return restClient
-                .post(WARRANTY_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
-                .execute();
+        return factory
+                .create("requestToWarranty")
+                .run(() -> restClient
+                        .post(WARRANTY_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
+                        .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                        .commonErrorResponseClass(ErrorResponse.class)
+                        .execute());
     }
 }

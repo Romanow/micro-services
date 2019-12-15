@@ -13,4 +13,3 @@ include 'warranty-api'
 include 'warranty-service'
 
 include 'eureka'
-include 'turbine'

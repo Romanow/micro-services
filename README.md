@@ -15,7 +15,7 @@ Using:
 * Grafana and Prometheus for collecting metrics.
 * PostgreSQL.
 * ELK for logging.
-* Turbine for monitoring Hystrix.
+* Resilience4j as Circuit Breaker.
 * Spring Sleuth for distributed tracing (using Zipkin protocol and Jaeger to collect data).
 
 ### Portainer for monitoring docker images

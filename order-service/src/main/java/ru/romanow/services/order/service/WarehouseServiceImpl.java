@@ -1,7 +1,7 @@
 package ru.romanow.services.order.service;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.AllArgsConstructor;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.core.spring.rest.client.SpringRestClient;
 import ru.romanow.services.order.exceptions.WarehouseProcessingException;
@@ -22,41 +22,50 @@ public class WarehouseServiceImpl
         implements WarehouseService {
     private static final String WAREHOUSE_SERVICE = "http://warehouse-service";
 
+    private final CircuitBreakerFactory factory;
     private final SpringRestClient restClient;
 
     @Nonnull
     @Override
-    @HystrixCommand(ignoreExceptions = { EntityNotFoundException.class, WarehouseProcessingException.class })
     public Optional<UUID> takeItem(@Nonnull UUID orderId, @Nonnull String model, @Nonnull SizeChart size) {
         final OrderItemRequest request = new OrderItemRequest()
                 .setOrderId(orderId)
                 .setModel(model)
                 .setSize(size.name());
 
-        return restClient
-                .post(WAREHOUSE_SERVICE + "/api/v1/", request, UUID.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
-                .execute();
+        return factory
+                .create("takeItem")
+                .run(() -> restClient
+                        .post(WAREHOUSE_SERVICE + "/api/v1/", request, UUID.class)
+                        .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                        .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
+                        .commonErrorResponseClass(ErrorResponse.class)
+                        .execute(),
+                     throwable -> fallback(throwable));
+    }
+
+    private Optional<UUID> fallback(Throwable throwable) {
+        if (throwable instanceof EntityNotFoundException || throwable instanceof WarehouseProcessingException) {
+            throw (RuntimeException)throwable;
+        }
+        return Optional.empty();
     }
 
     @Override
-    @HystrixCommand
     public void returnItem(@Nonnull UUID orderId, @Nonnull UUID itemId) {
-        restClient.delete(WAREHOUSE_SERVICE + "/api/v1/" + itemId, Void.class).execute();
+        factory.create("returnItem").run(() -> restClient.delete(WAREHOUSE_SERVICE + "/api/v1/" + itemId, Void.class).execute());
     }
 
     @Nonnull
     @Override
-    @HystrixCommand(ignoreExceptions = { EntityNotFoundException.class, WarehouseProcessingException.class })
     public Optional<OrderWarrantyResponse> useWarrantyItem(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request) {
-        return restClient
-                .post(WAREHOUSE_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
-                .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
-                .commonErrorResponseClass(ErrorResponse.class)
-                .execute();
+        return factory
+                .create("useWarrantyItem")
+                .run(() -> restClient
+                        .post(WAREHOUSE_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
+                        .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                        .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
+                        .commonErrorResponseClass(ErrorResponse.class)
+                        .execute());
     }
-
 }

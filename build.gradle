@@ -55,7 +55,7 @@ configure(subprojects) { project ->
             compile "org.springframework.boot:spring-boot-starter-logging"
 
             compile "org.springframework.cloud:spring-cloud-netflix-eureka-client"
-            compile "org.springframework.cloud:spring-cloud-starter-netflix-hystrix"
+            compile "org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j"
             compile "org.springframework.cloud:spring-cloud-loadbalancer"
             compile "org.springframework.cloud:spring-cloud-starter-zipkin"
 
