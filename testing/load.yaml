@@ -1,0 +1,15 @@
+---
+phantom:
+  address: 192.168.31.223:8090
+  uris:
+    - /api/v1/221f3d2e-da16-410f-8d24-3974e38e54ad/orders
+  load_profile:
+    load_type: rps
+    schedule: line(10, 100, 5m)
+autostop:
+  autostop:
+    - http(5xx, 10%, 5s)
+console:
+  enabled: true
+telegraf:
+  enabled: false

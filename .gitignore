@@ -5,3 +5,5 @@
 out/
 bin/
 build/
+*.log
+logs/
