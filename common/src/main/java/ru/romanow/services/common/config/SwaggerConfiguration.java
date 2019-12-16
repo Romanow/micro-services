@@ -1,4 +1,4 @@
-package ru.romanow.services.order;
+package ru.romanow.services.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

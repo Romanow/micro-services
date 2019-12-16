@@ -1,4 +1,4 @@
-package ru.romanow.services.store;
+package ru.romanow.services.common.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;

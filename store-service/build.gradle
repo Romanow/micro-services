@@ -1,6 +1,7 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
+    compile project(":common")
     compile project(":store-api")
     compile project(":order-api")
     compile project(":warehouse-api")

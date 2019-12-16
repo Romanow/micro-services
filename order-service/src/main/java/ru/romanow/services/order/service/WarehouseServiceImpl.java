@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.romanow.core.spring.rest.client.SpringRestClient;
+import ru.romanow.services.common.config.CircuitBreakerConfiguration.Fallback;
 import ru.romanow.services.order.exceptions.WarehouseProcessingException;
 import ru.romanow.services.order.model.enums.SizeChart;
 import ru.romanow.services.warehouse.model.ErrorResponse;
@@ -16,6 +17,9 @@ import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.POST;
+
 @Service
 @AllArgsConstructor
 public class WarehouseServiceImpl
@@ -24,6 +28,7 @@ public class WarehouseServiceImpl
 
     private final CircuitBreakerFactory factory;
     private final SpringRestClient restClient;
+    private final Fallback fallback;
 
     @Nonnull
     @Override
@@ -33,39 +38,38 @@ public class WarehouseServiceImpl
                 .setModel(model)
                 .setSize(size.name());
 
+        final String url = WAREHOUSE_SERVICE + "/api/v1/";
         return factory
                 .create("takeItem")
                 .run(() -> restClient
-                        .post(WAREHOUSE_SERVICE + "/api/v1/", request, UUID.class)
-                        .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                        .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
-                        .commonErrorResponseClass(ErrorResponse.class)
-                        .execute(),
-                     throwable -> fallback(throwable));
-    }
-
-    private Optional<UUID> fallback(Throwable throwable) {
-        if (throwable instanceof EntityNotFoundException || throwable instanceof WarehouseProcessingException) {
-            throw (RuntimeException)throwable;
-        }
-        return Optional.empty();
+                             .post(url, request, UUID.class)
+                             .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                             .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
+                             .commonErrorResponseClass(ErrorResponse.class)
+                             .execute(),
+                     throwable -> fallback.apply(POST, url, throwable));
     }
 
     @Override
     public void returnItem(@Nonnull UUID orderId, @Nonnull UUID itemId) {
-        factory.create("returnItem").run(() -> restClient.delete(WAREHOUSE_SERVICE + "/api/v1/" + itemId, Void.class).execute());
+        final String url = WAREHOUSE_SERVICE + "/api/v1/" + itemId;
+        factory.create("returnItem")
+               .run(() -> restClient.delete(url, Void.class).execute(),
+                    throwable -> fallback.apply(DELETE, url, throwable));
     }
 
     @Nonnull
     @Override
     public Optional<OrderWarrantyResponse> useWarrantyItem(@Nonnull UUID itemId, @Nonnull OrderWarrantyRequest request) {
+        final String url = WAREHOUSE_SERVICE + "/api/v1/" + itemId + "/warranty";
         return factory
                 .create("useWarrantyItem")
                 .run(() -> restClient
-                        .post(WAREHOUSE_SERVICE + "/api/v1/" + itemId + "/warranty", request, OrderWarrantyResponse.class)
-                        .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
-                        .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
-                        .commonErrorResponseClass(ErrorResponse.class)
-                        .execute());
+                             .post(url, request, OrderWarrantyResponse.class)
+                             .addExceptionMapping(404, (ex) -> new EntityNotFoundException(ex.getBody(ErrorResponse.class).getMessage()))
+                             .addExceptionMapping(409, (ex) -> new WarehouseProcessingException(ex.getBody(ErrorResponse.class).getMessage()))
+                             .commonErrorResponseClass(ErrorResponse.class)
+                             .execute(),
+                     throwable -> fallback.apply(POST, url, throwable, request.toString()));
     }
 }

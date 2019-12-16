@@ -1,0 +1,37 @@
+apply plugin: "io.spring.dependency-management"
+apply plugin: "org.springframework.boot"
+
+dependencies {
+    compile "ru.romanow.core:commons:${utilsVersion}"
+    compile "ru.romanow.core:spring-rest-client:${utilsVersion}"
+
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "org.springframework.boot:spring-boot-starter-data-jpa"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-starter-security"
+    compile "org.springframework.boot:spring-boot-starter-logging"
+
+    compile("org.springframework.cloud:spring-cloud-netflix-eureka-client") {
+        exclude module: "spring-cloud-netflix-hystrix"
+    }
+    compile "org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j"
+    compile "org.springframework.cloud:spring-cloud-loadbalancer"
+    compile "org.springframework.cloud:spring-cloud-starter-zipkin"
+
+    compile "io.micrometer:micrometer-registry-prometheus"
+
+    compile "com.netflix.eureka:eureka-client"
+    compile "com.netflix.ribbon:ribbon-eureka"
+
+    compile "ch.qos.logback:logback-classic"
+    compile "net.logstash.logback:logstash-logback-encoder:${logstahVersion}"
+
+    compile "org.postgresql:postgresql"
+    compile "org.flywaydb:flyway-core"
+
+    compile "io.swagger:swagger-annotations:${swaggerVersion}"
+    compile "io.springfox:springfox-swagger2:${swaggerSpringVersion}"
+}
+
+bootJar.enabled = false
+jar.enabled = true
